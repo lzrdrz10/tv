@@ -1,159 +1,417 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:300,400,700" rel="stylesheet">
-<title>Los Simpson: La película</title>
-<style>
-  * { box-sizing: border-box; margin:0; padding:0; }
-  html, body {
-    height:100%; width:100%; font-family: 'Roboto Condensed', sans-serif;
-    background-color: #000; color: #fff; overflow-x:hidden;
-    display:flex; flex-direction:column;
-  }
-
-  .Wallpaper {
-    position:absolute; top:0; left:0; width:100%; height:65vh;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.9)), url(https://image.tmdb.org/t/p/original/8ln5VUVk7gnNGIb2VNgw8nICDVt.jpg);
-    background-size:cover; background-position:center; z-index:0;
-  }
-
-  .main-content {
-    position: relative; z-index:1; padding:25px; margin-top:45vh;
-    display:flex; flex-direction:column; gap:25px;
-  }
-
-  .header { display:flex; gap:25px; align-items:flex-start; justify-content:flex-start; }
-  .SingleHead { width:160px; flex-shrink:0; border-radius:10px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.7); }
-  .SingleHead img { width:100%; display:block; }
-
-  .title-info h1 {
-    margin:0 0 12px; font-size:2.4em; font-weight:300;
-    text-shadow:1px 1px 4px rgba(0,0,0,0.8); line-height:1.1;
-  }
-
-  .MovieInfo { font-size:1.2em; line-height:1.8; color:#ddd; }
-  .MovieInfo b span { color:#E50914; }
-
-  .botones { margin:20px 0; }
-  #btnReproducir {
-    padding:16px 40px; font-size:1.3em; font-weight:bold;
-    background:#E50914; color:white; border:none; border-radius:8px;
-    cursor:pointer; display:inline-flex; align-items:center; gap:12px;
-    min-width:220px; justify-content:center; text-transform:uppercase;
-    transition: all 0.2s;
-  }
-  #btnReproducir:focus { outline:4px solid #fff; outline-offset:3px; transform:scale(1.05); }
-  #btnReproducir:hover { background:#c70610; }
-
-  .SinopsisBoxFixed {
-    position:fixed; top:80px; right:25px; width:30%; min-width:250px; max-height:80vh;
-    background: rgba(20,20,20,0.9); padding:20px; border-radius:10px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.7); color:#eee; font-size:1.1em; line-height:1.6;
-    overflow-y:auto; z-index:5; transition:all 0.3s;
-  }
-  .SinopsisBoxFixed:hover { box-shadow:0 15px 40px rgba(229,9,20,0.8); transform:translateY(-3px); }
-
-  /* Reproductor fullscreen */
-  #videoCont {
-    display:none; position:fixed; top:0; left:0; width:100%; height:100%;
-    background:#000; z-index:999; justify-content:center; align-items:center;
-  }
-  #videoFrame {
-    width:100%; height:100%; border:none;
-  }
-
-  @media (max-width:1024px) {
-    .header { flex-direction:column; gap:15px; }
-    .SingleHead { width:130px; }
-    .title-info h1 { font-size:2em; }
-    #btnReproducir { font-size:1.1em; padding:14px 30px; min-width:200px; }
-    .SinopsisBoxFixed { position:static; width:100%; max-height:none; margin-top:20px; transform:none; }
-  }
-  @media (max-width:760px) {
-    .title-info h1 { font-size:1.7em; }
-    .SingleHead { width:110px; }
-    .main-content { padding:15px; }
-  }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>V/H/S/Halloween</title>
+  <!-- Fuentes y íconos -->
+  <link href="https://fonts.googleapis.com/css2?family=Netflix+Sans:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    /* Reset y tipografía Netflix */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #000;
+      color: #fff;
+      font-family: 'Netflix Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow-x: hidden;
+      line-height: 1.5;
+    }
+    /* Fondo con backdrop borroso */
+    .backdrop {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.9) 100%),
+            url('https://image.tmdb.org/t/p/original/2JHJtATet58dzGpEwFek0kKGJFo.jpg') center/cover no-repeat;
+      filter: blur(8px) brightness(0.6);
+      z-index: -1;
+      transform: scale(1.1);
+    }
+    /* Contenedor principal */
+    .container {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+    /* Header con poster y título */
+    .header {
+      padding-top: 60px;
+      text-align: center;
+      position: relative;
+    }
+    .poster {
+      width: 160px;
+      height: 240px;
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 0 auto 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .poster img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .title {
+      font-size: 28px;
+      font-weight: 900;
+      margin-bottom: 8px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    }
+    .meta {
+      font-size: 14px;
+      color: #aaa;
+      margin-bottom: 16px;
+    }
+    .meta span {
+      margin-right: 12px;
+    }
+    .match {
+      color: #46d369;
+      font-weight: 700;
+    }
+    /* Botones principales (estilo Netflix) */
+    .actions {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin: 24px 0;
+    }
+    .btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .btn:active {
+      transform: scale(0.92);
+    }
+    .btn-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      transition: all 0.2s ease;
+    }
+    .btn-play .btn-icon {
+      background: #fff;
+      color: #000;
+      font-size: 24px;
+    }
+    .btn:hover .btn-icon,
+    .btn:active .btn-icon {
+      background: rgba(255,255,255,0.3);
+    }
+    .btn-play:hover .btn-icon {
+      background: #e6e6e6;
+    }
+    /* Botón descargar */
+    .btn-download {
+      margin-top: 16px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 4px;
+      font-weight: 600;
+      width: 100%;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .btn-download:active {
+      background: rgba(255,255,255,0.2);
+      transform: scale(0.98);
+    }
+    /* Sinopsis */
+    .synopsis {
+      font-size: 15px;
+      color: #ccc;
+      line-height: 1.6;
+      margin: 24px 0;
+    }
+    .synopsis-title {
+      color: #fff;
+      font-weight: 700;
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+    /* Video player (full screen) */
+    #videoCont {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: #000;
+      z-index: 9999;
+      flex-direction: column;
+    }
+    #videoFrame {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .player-controls {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      right: 16px;
+      display: flex;
+      justify-content: space-between;
+      z-index: 10000;
+    }
+    .player-btn {
+      background: rgba(0,0,0,0.6);
+      border: none;
+      color: #fff;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      backdrop-filter: blur(10px);
+    }
+    /* Responsive */
+    @media (max-width: 380px) {
+      .title { font-size: 24px; }
+      .poster { width: 140px; height: 210px; }
+      .actions { gap: 12px; }
+      .btn-icon { width: 48px; height: 48px; }
+    }
+  </style>
 </head>
 <body>
-
-<div class="Wallpaper"></div>
-
-<div class="main-content">
-  <div class="header">
-    <div class="SingleHead">
-      <img src="https://www.themoviedb.org/t/p/w600_and_h900_bestv2/d9wHkwF9ttnNKuOoEIStve32jEk.jpg" alt="Los Simpson: La película">
-    </div>
-
-    <div class="title-info">
-      <h1>Los Simpson: La película</h1>
-      <div class="MovieInfo">
-        <b><span>Año:</span></b> <span>2007</span><br>
-        <b><span>Género:</span></b> <span>Animación, Comedia, Familia</span><br>
-        <b><span>Duración:</span></b> <span>87 Minutos</span>
+  <!-- Fondo borroso -->
+  <div class="backdrop"></div>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="poster">
+        <img src="https://image.tmdb.org/t/p/w600_and_h900_bestv2/bvMKSZtN8KAdtlKoYbEi1Zhyaou.jpg" alt="">
       </div>
-      <div class="botones">
-        <button id="btnReproducir" tabindex="1"><i class="fas fa-play"></i> Reproducir</button>
+      <h1 class="title">V/H/S/Halloween</h1>
+      <div class="meta">
+        <p><span>año: 2025</span></p>
+        <span class="match">63% para ti</span>
+        <span>1hora</span><span>55minutos</span>
+      </div>
+    </div>
+    <!-- Acciones principales -->
+    <div class="actions">
+      <button class="btn btn-play" id="btnReproducir">
+        <div class="btn-icon"><i class="fas fa-play"></i></div>
+        <span>Reproducir</span>
+      </button>
+      <button class="btn" id="btnLista">
+        <div class="btn-icon"><i class="fas fa-plus"></i></div>
+        <span>Mi lista</span>
+      </button>
+      <button class="btn" id="btnInfo">
+        <div class="btn-icon"><i class="fas fa-info"></i></div>
+        <span>Info</span>
+      </button>
+    </div>
+    <!-- Botón descargar -->
+    <button class="btn-download" id="download-btn" data-url="">
+      <i class="fas fa-download"></i> Descargar
+    </button>
+    <!-- Sinopsis -->
+    <div class="synopsis" id="synopsis">
+      <div class="synopsis-title">Sinopsis</div>
+      <p id="synopsisText">Una colección de videos con temática de Halloween desata una serie de historias retorcidas y llenas de sangre, que transforman el truco o trato en una lucha por la supervivencia.</p>
+      <button id="toggleSynopsis" style="display:none; background:none; border:none; color:#46d369; font-weight:700; cursor:pointer; margin-top:8px;">Ver más</button>
+    </div>
+    <!-- Modal Más información -->
+    <div id="infoModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); backdrop-filter:blur(6px); z-index:9999; justify-content:center; align-items:center;">
+      <div style="background:#111; padding:24px; border-radius:12px; max-width:400px; width:90%; max-height:80%; overflow-y:auto; position:relative;">
+        <button id="closeModal" style="position:absolute; top:12px; right:12px; background:none; border:none; color:#fff; font-size:20px; cursor:pointer;"><i class="fas fa-times"></i></button>
+        <p><strong>Director:</strong> Bryan M. Ferguson</p>
+        <p><strong>Género:</strong> Terror, Suspense</p>
+        <p><strong>País:</strong> United States of America, United Arab Emirates</p>
+        <p><strong>Título Original:</strong> V/H/S/Halloween</p>
+        <p><strong>Eslogan:</strong> N/A</p>
+        <p><strong>Presupuesto:</strong> $0</p>
+        <p><strong>Ingresos:</strong> $0</p>
       </div>
     </div>
   </div>
-</div>
+  <!-- Reproductor full screen -->
+  <div id="videoCont">
+    <div class="player-controls">
+      <button class="player-btn" id="btnVolver"><i class="fas fa-arrow-left"></i></button>
+      <button class="player-btn" id="cast-btn"><i class="fas fa-tv"></i></button>
+    </div>
+    <iframe id="videoFrame" src="https://lzrdrz10.github.io/repro/player.html?video=aHR0cHM6Ly8xYS0xNzkxLmNvbS92aWRlby9md2UyL2QwL3M4LzIvVS9wL3ovcS9VcHpxei5hYWEubXA0&poster=aHR0cHM6Ly9pbWFnZS50bWRiLm9yZy90L3Avb3JpZ2luYWwvMkpISnRBVGV0NThkekdwRXdGZWswa0tHSkZvLmpwZw==&title=Vi9IL1MvSGFsbG93ZWVu" data-alternativo="" allowfullscreen></iframe>
+  </div>
 
-<div class="SinopsisBoxFixed">
-  <h2 style="color:#E50914; margin-bottom:10px;">Sinopsis:</h2>
-  <p>Homer debe salvar al mundo de una catástrofe que él mismo ha provocado. Todo comienza con Homer, su nueva mascota, un cerdo, y un silo lleno de excrementos que tiene una fuga, una combinación que desencadena un desastre distinto a todo lo que Springfield haya experimentado jamás. Mientras Marge está indignada por la monumental metedura de pata de su patán marido, una turba vengativa cae sobre el hogar de los Simpson...</p>
-</div>
+  <script>
+    // ---------- Reproducir ----------
+    document.getElementById('btnReproducir').addEventListener('click', () => {
+      const cont = document.getElementById('videoCont');
+      cont.style.display = 'flex';
+      if (cont.requestFullscreen) cont.requestFullscreen();
+      else if (cont.webkitRequestFullscreen) cont.webkitRequestFullscreen();
+    });
+    // ---------- Volver ----------
+    document.getElementById('btnVolver').addEventListener('click', () => {
+      const cont = document.getElementById('videoCont');
+      cont.style.display = 'none';
+      if (document.exitFullscreen) document.exitFullscreen();
+      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+    });
+    // ---------- Descargar con 1DM ----------
+    document.getElementById('download-btn').addEventListener('click', (e) => {
+      e.preventDefault();
+      const url = e.currentTarget.getAttribute('data-url');
+      if (!url) return alert('No hay enlace de descarga');
+      const clean = url.replace('https://', '').replace('http://', '');
+      const plus = 'intent://' + clean + '#Intent;package=idm.internet.download.manager.plus;scheme=https;end';
+      const normal = 'intent://' + clean + '#Intent;package=idm.internet.download.manager;scheme=https;end';
+      location.href = plus;
+      setTimeout(() => location.href = normal, 1000);
+    });
+    // ---------- Modal Más Información ----------
+    const btnInfo = document.getElementById('btnInfo');
+    const infoModal = document.getElementById('infoModal');
+    const closeModal = document.getElementById('closeModal');
+    btnInfo.addEventListener('click', () => infoModal.style.display = 'flex');
+    closeModal.addEventListener('click', () => infoModal.style.display = 'none');
+    infoModal.addEventListener('click', (e) => { if (e.target === infoModal) infoModal.style.display = 'none'; });
 
-<div id="videoCont">
-  <iframe id="videoFrame" src="https://hugh.cdn.rumble.cloud/video/fww1/90/s8/2/Q/m/f/5/Qmf5y.aaa.mp4" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-</div>
-
-<script>
-var videoCont = document.getElementById('videoCont');
-var videoFrame = document.getElementById('videoFrame');
-var btnReproducir = document.getElementById('btnReproducir');
-
-// Reproducir video fullscreen
-btnReproducir.addEventListener('click', function() {
-  videoFrame.src = '${video}';
-  videoCont.style.display = 'flex';
-  videoFrame.requestFullscreen?.();
-  // Oculta el contenido principal
-  document.querySelector('.main-content').style.display = 'none';
-  document.querySelector('.SinopsisBoxFixed').style.display = 'none';
-});
-
-// Volver al contenido
-function cerrarVideo() {
-  videoCont.style.display = 'none';
-  videoFrame.src = '';
-  document.querySelector('.main-content').style.display = 'flex';
-  document.querySelector('.SinopsisBoxFixed').style.display = 'block';
-  btnReproducir.focus();
-}
-
-// Teclas de mando
-document.addEventListener('keydown', function(e) {
-  if(e.key === 'Backspace' || e.key === 'Escape') {
-    if(videoCont.style.display === 'flex') {
-      cerrarVideo();
+    // ---------- Sinopsis Ver más / Ver menos ----------
+    const synopsisText = document.getElementById('synopsisText');
+    const toggleSynopsis = document.getElementById('toggleSynopsis');
+    const maxLength = 200;
+    if (synopsisText.textContent.length > maxLength) {
+      const fullText = synopsisText.textContent;
+      const shortText = fullText.slice(0, maxLength) + '...';
+      synopsisText.textContent = shortText;
+      toggleSynopsis.style.display = 'inline-block';
+      let expanded = false;
+      toggleSynopsis.addEventListener('click', () => {
+        if (expanded) {
+          synopsisText.textContent = shortText;
+          toggleSynopsis.textContent = 'Ver más';
+        } else {
+          synopsisText.textContent = fullText;
+          toggleSynopsis.textContent = 'Ver menos';
+        }
+        expanded = !expanded;
+      });
     }
-  }
-  if(e.key === 'Enter' || e.key === ' ') {
-    var focused = document.activeElement;
-    if(focused && focused.click) focused.click();
-  }
-});
 
-// Enfocar botón al cargar
-window.addEventListener('load', function() {
-  btnReproducir.focus();
-});
-</script>
+    // ========== EXTRAER DATOS DEL COMENTARIO (SIN QUITAR NADA) ==========
+    function extractMovieData() {
+      let commentText = '';
+      const walker = document.createTreeWalker(document, NodeFilter.SHOW_COMMENT, null, false);
+      let node;
+      while ((node = walker.nextNode())) {
+        const value = node.nodeValue.trim();
+        if (value.startsWith('Datos')) {
+          commentText = value;
+          break;
+        }
+      }
+      if (!commentText) return null;
 
+      const backdropMatch = commentText.match(/Poster Backdrop:\s*([^\s]+)/i);
+      const titleMatch = commentText.match(/Titulo:\s*([^<\n\r]+)/i);
+      const yearMatch = commentText.match(/Año:\s*(\d{4})/i);
+
+      return {
+        backdrop: backdropMatch ? backdropMatch[1].trim() : '',
+        title: titleMatch ? titleMatch[1].trim() : '',
+        year: yearMatch ? yearMatch[1] : '',
+        pageUrl: window.location.href
+      };
+    }
+
+    // ---------- Mi lista (GUARDA SOLO LO NECESARIO, NO TOCA EL COMENTARIO) ----------
+    document.getElementById('btnLista').addEventListener('click', (e) => {
+      const btn = e.currentTarget;
+      const icon = btn.querySelector('i');
+      const text = btn.querySelector('span');
+      const movieData = extractMovieData();
+
+      if (!movieData || !movieData.backdrop || !movieData.title) {
+        alert('No se pudieron obtener los datos de la película.');
+        return;
+      }
+
+      try {
+        let lista = JSON.parse(localStorage.getItem('miLista')) || [];
+        const exists = lista.some(m => m.url === movieData.pageUrl);
+
+        if (!exists) {
+          lista.push({
+            title: movieData.title,
+            year: movieData.year,
+            poster: movieData.backdrop,  // backdrop = mejor fondo
+            url: movieData.pageUrl,
+            addedAt: new Date().toISOString()
+          });
+          localStorage.setItem('miLista', JSON.stringify(lista));
+          icon.classList.replace('fa-plus', 'fa-check');
+          text.textContent = 'Añadido';
+        } else {
+          lista = lista.filter(m => m.url !== movieData.pageUrl);
+          localStorage.setItem('miLista', JSON.stringify(lista));
+          icon.classList.replace('fa-check', 'fa-plus');
+          text.textContent = 'Mi lista';
+        }
+      } catch (error) {
+        console.error('Error al acceder a localStorage:', error);
+        alert('No se pudo actualizar tu lista.');
+      }
+    });
+
+    // ---------- Inicializar estado del botón ----------
+    (function initListaButton() {
+      const btn = document.getElementById('btnLista');
+      if (!btn) return;
+      const icon = btn.querySelector('i');
+      const text = btn.querySelector('span');
+      const movieData = extractMovieData();
+      if (!movieData || !movieData.pageUrl) return;
+
+      const lista = JSON.parse(localStorage.getItem('miLista')) || [];
+      if (lista.some(m => m.url === movieData.pageUrl)) {
+        icon.classList.replace('fa-plus', 'fa-check');
+        text.textContent = 'Añadido';
+      }
+    })();
+  </script>
+
+  <!-- Datos
+   Poster Backdrop: https://image.tmdb.org/t/p/original/2JHJtATet58dzGpEwFek0kKGJFo.jpg
+   Año: 2025
+   Titulo: V/H/S/Halloween
+   Poster: https://image.tmdb.org/t/p/w600_and_h900_bestv2/bvMKSZtN8KAdtlKoYbEi1Zhyaou.jpg
+   Generos: Terror, Suspense
+   calificacion: 63%
+   Sinopsis: Una colección de videos con temática de Halloween desata una serie de historias retorcidas y llenas de sangre, que transforman el truco o trato en una lucha por la supervivencia.
+   Tiempo: 1 hora 55minutos
+   -->
 </body>
 </html>
