@@ -156,20 +156,26 @@
       margin-bottom: 8px;
       font-size: 16px;
     }
-    /* Video player (full screen) */
-    #videoCont {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-     
-      z-index: 9999;
-      flex-direction: column;
-    }
-   #videoFrame {
+/* Video player (full screen) */
+#videoCont {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: #000;
+  z-index: 9999;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#videoFrame {
   width: 100vw !important;
   height: 100vh !important;
-  object-fit: contain;
+  border: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  object-fit: cover; /* Cambiado a 'cover' para llenar */
   background: #000;
+  display: block;
 }
     .player-controls {
       position: absolute;
@@ -491,6 +497,7 @@ document.getElementById('btnLista').addEventListener('click', (e) => {
    -->
 </body>
 </html>
+
 
 
 
