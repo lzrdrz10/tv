@@ -272,7 +272,7 @@
     const cont = document.getElementById('videoCont');
     const videoFrame = document.getElementById('videoFrame');
 
-    // Mostrar contenedor del reproductor
+    // Mostrar contenedor
     cont.style.display = 'flex';
 
     try {
@@ -285,56 +285,90 @@
         await cont.msRequestFullscreen();
       }
 
-      // 2. Forzar orientación horizontal (solo Android y navegadores modernos)
+      // 2. Forzar orientación horizontal (solo Android)
       if (screen.orientation && screen.orientation.lock) {
-        await screen.orientation.lock('landscape').catch(err => {
-          console.warn("No se pudo bloquear orientación:", err);
-        });
+        await screen.orientation.lock('landscape').catch(() => {});
       }
 
-      // 3. Detectar iOS y sugerir giro manual
+      // 3. iOS: sugerir giro
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
       if (isIOS && screen.orientation && screen.orientation.type.includes('portrait')) {
         setTimeout(() => {
-          if (confirm("Para una mejor experiencia, gira tu dispositivo horizontalmente.\n\n¿Deseas continuar?")) {
-            // Opcional: recargar iframe para ajustar
+          if (confirm("Gira tu dispositivo para ver mejor")) {
             videoFrame.src = videoFrame.src;
           }
         }, 800);
       }
 
-      // 4. Asegurar que el video se recargue bien en horizontal
+      // 4. Recargar iframe para ajustar
       setTimeout(() => {
         const src = videoFrame.src;
-        videoFrame.src = ''; // reset
-        setTimeout(() => videoFrame.src = src, 100); // recarga
+        videoFrame.src = '';
+        setTimeout(() => videoFrame.src = src, 100);
       }, 600);
 
     } catch (err) {
-      console.error("Error al activar pantalla completa o rotación:", err);
+      console.error("Error al activar fullscreen o rotación:", err);
     }
   });
 
-  // ---------- Volver (SALIR DE PANTALLA COMPLETA Y DESBLOQUEAR) ----------
-  document.getElementById('btnVolver').addEventListener('click', async () => {
+  // ---------- FUNCIÓN PARA CERRAR REPRODUCTOR (PAUSAR + SALIR) ----------
+  async function cerrarReproductor() {
     const cont = document.getElementById('videoCont');
+    const videoFrame = document.getElementById('videoFrame');
 
-    // Ocultar reproductor
+    // 1. Ocultar contenedor
     cont.style.display = 'none';
 
-    // Salir de pantalla completa
-    if (document.exitFullscreen) {
-      await document.exitFullscreen();
-    } else if (document.webkitExitFullscreen) {
-      await document.webkitExitFullscreen();
-    } else if (document.msExitFullscreen) {
-      await document.msExitFullscreen();
+    // 2. **CORTAR VIDEO: eliminar src del iframe**
+    if (videoFrame) {
+      videoFrame.src = ''; // Esto DETIENE el video por completo
     }
 
-    // Desbloquear orientación
+    // 3. Salir de pantalla completa
+    if (document.fullscreenElement || document.webkitFullscreenElement) {
+      if (document.exitFullscreen) {
+        await document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        await document.webkitExitFullscreen();
+      }
+    }
+
+    // 4. Desbloquear orientación
     if (screen.orientation && screen.orientation.unlock) {
       screen.orientation.unlock();
     }
+
+    // 5. Scroll al inicio (fuera del iframe)
+    window.scrollTo(0, 0);
+  }
+
+  // ---------- Botón Volver ----------
+  document.getElementById('btnVolver').addEventListener('click', cerrarReproductor);
+
+  // ---------- BOTÓN ATRÁS DEL MÓVIL (BACK BUTTON) ----------
+  let reproduciendo = false;
+
+  // Detectar cuando se abre el reproductor
+  document.getElementById('btnReproducir').addEventListener('click', () => {
+    reproduciendo = true;
+  });
+
+  // Escuchar el botón físico "Atrás"
+  window.addEventListener('popstate', () => {
+    if (reproduciendo) {
+      cerrarReproductor();
+      reproduciendo = false;
+      // Evitar que el historial se rompa
+      history.pushState(null, null, location.href);
+    }
+  });
+
+  // Al cargar la página, asegurarse de que no esté "reproduciendo" por error
+  window.addEventListener('load', () => {
+    reproduciendo = false;
+    // Forzar estado inicial
+    history.replaceState(null, null, location.href);
   });
 
   // ---------- Descargar con 1DM ----------
@@ -379,7 +413,7 @@
     });
   }
 
-  // ========== EXTRAER DATOS DEL COMENTARIO (SIN QUITAR NADA) ==========
+  // ========== EXTRAER DATOS DEL COMENTARIO ==========
   function extractMovieData() {
     let commentText = '';
     const walker = document.createTreeWalker(document, NodeFilter.SHOW_COMMENT, null, false);
@@ -403,7 +437,7 @@
     };
   }
 
-  // ---------- Mi lista (GUARDA SOLO LO NECESARIO) ----------
+  // ---------- Mi lista ----------
   document.getElementById('btnLista').addEventListener('click', (e) => {
     const btn = e.currentTarget;
     const icon = btn.querySelector('i');
@@ -439,7 +473,7 @@
     }
   });
 
-  // ---------- Inicializar estado del botón ----------
+  // ---------- Inicializar botón Mi lista ----------
   (function initListaButton() {
     const btn = document.getElementById('btnLista');
     if (!btn) return;
