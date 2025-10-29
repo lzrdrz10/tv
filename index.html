@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+  <title>Netflix TV</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#E50914">
+  <style>
+    /* ===== ESTILO NETFLIX TV 2025 ===== */
+    :root {
+      --bg:#141414;
+      --card:#221f1f;
+      --text:#fff;
+      --accent:#E50914;
+      --glow:0 0 30px rgba(229,9,20,.8);
+      --radius:8px;
+    }
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    * { outline: none !important; }
+    body {
+      background:var(--bg);
+      color:var(--text);
+      font-family:'Inter',sans-serif;
+      overflow-x:hidden;
+      -webkit-font-smoothing: antialiased;
+      user-select: none;
+    }
+    /* Desactivar hover */
+    a:hover, .card:hover, .category:hover, .btn-play:hover, .btn-info:hover { all: unset; }
+
+    header {
+      position:fixed;top:0;left:0;right:0;z-index:1000;
+      display:flex;justify-content:space-between;align-items:center;
+      padding:12px 24px;background:rgba(20,20,20,.95);
+      backdrop-filter:blur(10px);
+    }
+    header img { height:32px; }
+    nav ul { display:flex;gap:20px;list-style:none; }
+    nav a {
+	text-decoration: none;
+      color:var(--text);font-size:18px;font-weight:600;
+      padding:10px 16px;border-radius:6px;transition:all .2s;
+      white-space:nowrap;
+    }
+
+    /* FOCO ULTRA VISUAL - NETFLIX STYLE */
+    nav a.focus, .btn-play.focus, .btn-info.focus,
+    .category.focus, .card.focus {
+      transform:scale(1.1) !important;
+      box-shadow:0 0 0 4px #fff, var(--glow) !important;
+      border:4px solid #fff !important;
+      z-index:10 !important;
+      position:relative;
+    }
+
+    .banner {
+      position:relative;height:56vh;overflow:hidden;
+      border-radius:var(--radius);margin-top:70px;
+    }
+    .banner img { width:100%;height:100%;object-fit:cover;filter:brightness(0.5); }
+    .banner-content {
+      position:absolute;bottom:0;left:0;right:0;
+      padding:40px 5%;color:#fff;z-index:2;
+    }
+    .banner-title { font-size:7vw;font-weight:700;margin-bottom:16px;text-shadow:0 2px 8px rgba(0,0,0,.8); }
+    .banner-desc { font-size:3.8vw;max-width:600px;margin-bottom:24px;opacity:.9; }
+    .btn-play,.btn-info {
+      display:inline-flex;align-items:center;gap:8px;
+      padding:14px 28px;border-radius:6px;font-weight:600;
+      font-size:17px;margin-right:12px;transition:all .2s;
+      cursor: default;
+    }
+    .btn-play { background:#fff;color:#000; }
+    .btn-info { background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3); }
+
+    .categories-container {
+      padding:16px 0;overflow-x:auto;scrollbar-width:none;
+      scroll-behavior: smooth;
+    }
+    .categories-container::-webkit-scrollbar { display:none; }
+    .categories { display:flex;gap:20px;padding:0 5%; }
+    .category {
+      flex:0 0 220px;height:140px;background:var(--card);
+      border-radius:var(--radius);overflow:hidden;
+      display:flex;align-items:center;justify-content:center;
+      position:relative;transition:all .25s;
+    }
+    .category img {
+      max-width:70%;max-height:60%;filter:brightness(0) invert(1);
+      transition:transform .3s;
+    }
+    .category.focus img { transform:scale(1.15); }
+
+    .section { padding:16px 5%; }
+    .section h2 { font-size:24px;margin:16px 0 12px;font-weight:700; }
+    .scroll {
+      display:flex;gap:20px;overflow-x:auto;
+      padding:8px 0;scrollbar-width:none;scroll-snap-type:x mandatory;
+      scroll-behavior: smooth;
+    }
+    .scroll::-webkit-scrollbar { display:none; }
+    .card {
+      flex:0 0 280px;height:160px;border-radius:var(--radius);
+      overflow:hidden;background:var(--card);
+      position:relative;scroll-snap-align:center;transition:all .25s;
+    }
+    .card img { width:100%;height:100%;object-fit:cover; }
+    .card-title {
+      position:absolute;bottom:0;left:0;right:0;
+      background:linear-gradient(transparent,rgba(0,0,0,.8));
+      color:#fff;padding:24px 16px 12px;
+      font-size:16px;font-weight:600;opacity:0;transition:opacity .2s;
+    }
+    .card.focus .card-title { opacity:1; }
+
+    /* Indicador de scroll */
+    .scroll::after {
+      content:'';position:absolute;bottom:8px;left:50%;transform:translateX(-50%);
+      width:40px;height:4px;background:rgba(255,255,255,.3);border-radius:2px;
+      opacity:0;transition:opacity .3s;
+    }
+    .scroll:has(.card.focus)::after { opacity:1; }
+
+    footer { padding:24px;text-align:center;font-size:14px;color:#777; }
+
+    .lazy {
+      background:#222;
+      background:linear-gradient(90deg,#222 25%,#2a2a2a 50%,#222 75%);
+      background-size:200% 100%;
+      animation:loading 1.5s infinite;
+    }
+    @keyframes loading {
+      0%{background-position:200% 0}
+      100%{background-position:-200% 0}
+    }
+
+    @media(min-width:768px){
+      .banner-title{font-size:48px}
+      .banner-desc{font-size:20px}
+      .card{flex:0 0 360px;height:203px}
+      .category{flex:0 0 280px;height:160px}
+    }
+    @media(min-width:1024px){
+      .banner{height:70vh}
+      .section h2{font-size:28px}
+      nav a{font-size:20px}
+    }
+  </style>
+</head>
+<body>
+  <!-- Sonido de foco -->
+  <audio id="sfx-focus" preload="auto">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.mp3" type="audio/mpeg">
+  </audio>
+
+  <header>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" alt="Netflix">
+    <nav>
+      <ul>
+        <li><a href="#" data-id="home" tabindex="0">Inicio</a></li>
+        <li><a href="#" data-id="series" tabindex="0">Series</a></li>
+        <li><a href="#" data-id="peliculas" tabindex="0">Películas</a></li>
+        <li><a href="#" data-id="milista" tabindex="0">Mi lista</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="banner">
+    <img data-src="https://image.tmdb.org/t/p/original/7WsyChQLEftFiDOVTGkv3hFpyyt.jpg" class="lazy" alt="Banner">
+    <div class="banner-content">
+      <h1 class="banner-title">Avengers: Endgame</h1>
+      <p class="banner-desc">Los Vengadores se reúnen para deshacer las acciones de Thanos y restaurar el orden en el universo.</p>
+      <button class="btn-play" tabindex="0"><i class="fas fa-play"></i> Reproducir</button>
+      <button class="btn-info" tabindex="0"><i class="fas fa-info-circle"></i> Más información</button>
+    </div>
+  </div>
+
+  <div class="categories-container" data-row="0">
+    <div class="categories">
+      <div class="category" tabindex="0" data-title="Tendencias"><img class="lazy" data-src="https://cdn-icons-png.flaticon.com/512/1946/1946488.png"></div>
+      <div class="category" tabindex="0" data-title="Acción"><img class="lazy" data-src="https://cdn-icons-png.flaticon.com/512/3524/3524659.png"></div>
+      <div class="category" tabindex="0" data-title="Comedia"><img class="lazy" data-src="https://cdn-icons-png.flaticon.com/512/2919/2919600.png"></div>
+      <div class="category" tabindex="0" data-title="Drama"><img class="lazy" data-src="https://cdn-icons-png.flaticon.com/512/3069/3069178.png"></div>
+      <div class="category" tabindex="0" data-title="Infantil"><img class="lazy" data-src="https://cdn-icons-png.flaticon.com/512/3077/3077935.png"></div>
+    </div>
+  </div>
+
+  <div class="section" data-row="1">
+    <h2>Recomendaciones para ti</h2>
+    <div class="scroll">
+      <div class="card" tabindex="0" data-title="Stranger Things"><img class="lazy" data-src="https://image.tmdb.org/t/p/w780/49WJfeN0CzAs8ALhhVJ9vF17IG.jpg"><div class="card-title">Stranger Things</div></div>
+      <div class="card" tabindex="0" data-title="The Crown"><img class="lazy" data-src="https://image.tmdb.org/t/p/w780/pNiB0OuXrYkREfI7rH4cJYqPp1.jpg"><div class="card-title">The Crown</div></div>
+      <div class="card" tabindex="0" data-title="Breaking Bad"><img class="lazy" data-src="https://image.tmdb.org/t/p/w780/ggFHVNu6YYI5L9pCfOacjizRGt.jpg"><div class="card-title">Breaking Bad</div></div>
+      <div class="card" tabindex="0" data-title="Squid Game"><img class="lazy" data-src="https://image.tmdb.org/t/p/w780/dDlEmu3YjkIi5IEvwkmJiuKrV02.jpg"><div class="card-title">Squid Game</div></div>
+    </div>
+  </div>
+
+  <div class="section" data-row="2">
+    <h2>Top 10 en tu país</h2>
+    <div class="scroll">
+      <div class="card" tabindex="0" data-title="The Witcher"><img class="lazy" data-src="https://image.tmdb.org/t/p/w780/7zL5z4gP0jsaL0T0g86xK7q2yM.jpg"><div class="card-title">The Witcher</div></div>
+      <div class="card" tabindex="0" data-title="Money Heist"><img class="lazy" data-src="https://image.tmdb.org/t/p/w780/reEMJA1uzscCbkpeRJeTT2bjqUp.jpg"><div class="card-title">Money Heist</div></div>
+      <div class="card" tabindex="0" data-title="Dark"><img class="lazy" data-src="https://image.tmdb.org/t/p/w780/apbrGds2iP4p8kDfc9P2Efr5J9.jpg"><div class="card-title">Dark</div></div>
+    </div>
+  </div>
+
+  <footer><p>Netflix TV • Optimizado para Smart TV</p></footer>
+  <script src="script.js"></script>
+</body>
+</html>
