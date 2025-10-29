@@ -267,227 +267,204 @@
   </div>
 
   <script>
-  // ---------- Reproducir (FORZAR HORIZONTAL + PANTALLA COMPLETA) ----------
-  document.getElementById('btnReproducir').addEventListener('click', async () => {
-    const cont = document.getElementById('videoCont');
-    const videoFrame = document.getElementById('videoFrame');
+// ---------- Reproducir (FORZAR HORIZONTAL + PANTALLA COMPLETA) ----------
+document.getElementById('btnReproducir').addEventListener('click', async () => {
+  const cont = document.getElementById('videoCont');
+  const videoFrame = document.getElementById('videoFrame');
 
-    // Mostrar contenedor
-    cont.style.display = 'flex';
+  // Mostrar contenedor del reproductor
+  cont.style.display = 'flex';
 
-    try {
-      // 1. Entrar en pantalla completa
-      if (cont.requestFullscreen) {
-        await cont.requestFullscreen();
-      } else if (cont.webkitRequestFullscreen) {
-        await cont.webkitRequestFullscreen();
-      } else if (cont.msRequestFullscreen) {
-        await cont.msRequestFullscreen();
-      }
+  try {
+    // 1. Entrar en pantalla completa
+    if (cont.requestFullscreen) {
+      await cont.requestFullscreen();
+    } else if (cont.webkitRequestFullscreen) {
+      await cont.webkitRequestFullscreen();
+    } else if (cont.msRequestFullscreen) {
+      await cont.msRequestFullscreen();
+    }
 
-      // 2. Forzar orientación horizontal (solo Android)
-      if (screen.orientation && screen.orientation.lock) {
-        await screen.orientation.lock('landscape').catch(() => {});
-      }
+    // 2. Forzar orientación horizontal (solo Android y navegadores modernos)
+    if (screen.orientation && screen.orientation.lock) {
+      await screen.orientation.lock('landscape').catch(err => {
+        console.warn("No se pudo bloquear orientación:", err);
+      });
+    }
 
-      // 3. iOS: sugerir giro
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-      if (isIOS && screen.orientation && screen.orientation.type.includes('portrait')) {
-        setTimeout(() => {
-          if (confirm("Gira tu dispositivo para ver mejor")) {
-            videoFrame.src = videoFrame.src;
-          }
-        }, 800);
-      }
-
-      // 4. Recargar iframe para ajustar
+    // 3. Detectar iOS y sugerir giro manual
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    if (isIOS && screen.orientation && screen.orientation.type.includes('portrait')) {
       setTimeout(() => {
-        const src = videoFrame.src;
-        videoFrame.src = '';
-        setTimeout(() => videoFrame.src = src, 100);
-      }, 600);
-
-    } catch (err) {
-      console.error("Error al activar fullscreen o rotación:", err);
-    }
-  });
-
-  // ---------- FUNCIÓN PARA CERRAR REPRODUCTOR (PAUSAR + SALIR) ----------
-  async function cerrarReproductor() {
-    const cont = document.getElementById('videoCont');
-    const videoFrame = document.getElementById('videoFrame');
-
-    // 1. Ocultar contenedor
-    cont.style.display = 'none';
-
-    // 2. **CORTAR VIDEO: eliminar src del iframe**
-    if (videoFrame) {
-      videoFrame.src = ''; // Esto DETIENE el video por completo
+        if (confirm("Para una mejor experiencia, gira tu dispositivo horizontalmente.\n\n¿Deseas continuar?")) {
+          // Opcional: recargar iframe para ajustar
+          videoFrame.src = videoFrame.src;
+        }
+      }, 800);
     }
 
-    // 3. Salir de pantalla completa
-    if (document.fullscreenElement || document.webkitFullscreenElement) {
-      if (document.exitFullscreen) {
-        await document.exitFullscreen();
-      } else if (document.webkitExitFullscreen) {
-        await document.webkitExitFullscreen();
-      }
-    }
+    // 4. Asegurar que el video se recargue bien en horizontal
+    setTimeout(() => {
+      const src = videoFrame.src;
+      videoFrame.src = ''; // reset
+      setTimeout(() => videoFrame.src = src, 100); // recarga
+    }, 600);
 
-    // 4. Desbloquear orientación
-    if (screen.orientation && screen.orientation.unlock) {
-      screen.orientation.unlock();
-    }
+  } catch (err) {
+    console.error("Error al activar pantalla completa o rotación:", err);
+  }
+});
 
-    // 5. Scroll al inicio (fuera del iframe)
-    window.scrollTo(0, 0);
+// ---------- Volver (SALIR DE PANTALLA COMPLETA Y DESBLOQUEAR) ----------
+document.getElementById('btnVolver').addEventListener('click', async () => {
+  const cont = document.getElementById('videoCont');
+  const videoFrame = document.getElementById('videoFrame');
+
+  // Ocultar reproductor
+  cont.style.display = 'none';
+
+  // Detener reproducción (limpiar iframe)
+  const src = videoFrame.src;
+  videoFrame.src = ''; // detiene el video
+
+  // Salir de pantalla completa
+  if (document.exitFullscreen) {
+    await document.exitFullscreen();
+  } else if (document.webkitExitFullscreen) {
+    await document.webkitExitFullscreen();
+  } else if (document.msExitFullscreen) {
+    await document.msExitFullscreen();
   }
 
-  // ---------- Botón Volver ----------
-  document.getElementById('btnVolver').addEventListener('click', cerrarReproductor);
-
-  // ---------- BOTÓN ATRÁS DEL MÓVIL (BACK BUTTON) ----------
-  let reproduciendo = false;
-
-  // Detectar cuando se abre el reproductor
-  document.getElementById('btnReproducir').addEventListener('click', () => {
-    reproduciendo = true;
-  });
-
-  // Escuchar el botón físico "Atrás"
-  window.addEventListener('popstate', () => {
-    if (reproduciendo) {
-      cerrarReproductor();
-      reproduciendo = false;
-      // Evitar que el historial se rompa
-      history.pushState(null, null, location.href);
-    }
-  });
-
-  // Al cargar la página, asegurarse de que no esté "reproduciendo" por error
-  window.addEventListener('load', () => {
-    reproduciendo = false;
-    // Forzar estado inicial
-    history.replaceState(null, null, location.href);
-  });
-
-  // ---------- Descargar con 1DM ----------
-  document.getElementById('download-btn').addEventListener('click', (e) => {
-    e.preventDefault();
-    const url = e.currentTarget.getAttribute('data-url');
-    if (!url) return alert('No hay enlace de descarga');
-    const clean = url.replace('https://', '').replace('http://', '');
-    const plus = 'intent://' + clean + '#Intent;package=idm.internet.download.manager.plus;scheme=https;end';
-    const normal = 'intent://' + clean + '#Intent;package=idm.internet.download.manager;scheme=https;end';
-    location.href = plus;
-    setTimeout(() => location.href = normal, 1000);
-  });
-
-  // ---------- Modal Más Información ----------
-  const btnInfo = document.getElementById('btnInfo');
-  const infoModal = document.getElementById('infoModal');
-  const closeModal = document.getElementById('closeModal');
-  btnInfo.addEventListener('click', () => infoModal.style.display = 'flex');
-  closeModal.addEventListener('click', () => infoModal.style.display = 'none');
-  infoModal.addEventListener('click', (e) => { if (e.target === infoModal) infoModal.style.display = 'none'; });
-
-  // ---------- Sinopsis Ver más / Ver menos ----------
-  const synopsisText = document.getElementById('synopsisText');
-  const toggleSynopsis = document.getElementById('toggleSynopsis');
-  const maxLength = 200;
-  if (synopsisText.textContent.length > maxLength) {
-    const fullText = synopsisText.textContent;
-    const shortText = fullText.slice(0, maxLength) + '...';
-    synopsisText.textContent = shortText;
-    toggleSynopsis.style.display = 'inline-block';
-    let expanded = false;
-    toggleSynopsis.addEventListener('click', () => {
-      if (expanded) {
-        synopsisText.textContent = shortText;
-        toggleSynopsis.textContent = 'Ver más';
-      } else {
-        synopsisText.textContent = fullText;
-        toggleSynopsis.textContent = 'Ver menos';
-      }
-      expanded = !expanded;
-    });
+  // Desbloquear orientación
+  if (screen.orientation && screen.orientation.unlock) {
+    screen.orientation.unlock();
   }
 
-  // ========== EXTRAER DATOS DEL COMENTARIO ==========
-  function extractMovieData() {
-    let commentText = '';
-    const walker = document.createTreeWalker(document, NodeFilter.SHOW_COMMENT, null, false);
-    let node;
-    while ((node = walker.nextNode())) {
-      const value = node.nodeValue.trim();
-      if (value.startsWith('Datos')) {
-        commentText = value;
-        break;
-      }
-    }
-    if (!commentText) return null;
-    const backdropMatch = commentText.match(/Poster Backdrop:\s*([^\s]+)/i);
-    const titleMatch = commentText.match(/Titulo:\s*([^<\n\r]+)/i);
-    const yearMatch = commentText.match(/Año:\s*(\d{4})/i);
-    return {
-      backdrop: backdropMatch ? backdropMatch[1].trim() : '',
-      title: titleMatch ? titleMatch[1].trim() : '',
-      year: yearMatch ? yearMatch[1] : '',
-      pageUrl: window.location.href
-    };
-  }
+  // Restaurar el src del iframe para que esté listo la próxima vez
+  setTimeout(() => {
+    videoFrame.src = src;
+  }, 500);
+});
 
-  // ---------- Mi lista ----------
-  document.getElementById('btnLista').addEventListener('click', (e) => {
-    const btn = e.currentTarget;
-    const icon = btn.querySelector('i');
-    const text = btn.querySelector('span');
-    const movieData = extractMovieData();
-    if (!movieData || !movieData.backdrop || !movieData.title) {
-      alert('No se pudieron obtener los datos de la película.');
-      return;
+// ---------- Descargar con 1DM ----------
+document.getElementById('download-btn').addEventListener('click', (e) => {
+  e.preventDefault();
+  const url = e.currentTarget.getAttribute('data-url');
+  if (!url) return alert('No hay enlace de descarga');
+  const clean = url.replace('https://', '').replace('http://', '');
+  const plus = 'intent://' + clean + '#Intent;package=idm.internet.download.manager.plus;scheme=https;end';
+  const normal = 'intent://' + clean + '#Intent;package=idm.internet.download.manager;scheme=https;end';
+  location.href = plus;
+  setTimeout(() => location.href = normal, 1000);
+});
+
+// ---------- Modal Más Información ----------
+const btnInfo = document.getElementById('btnInfo');
+const infoModal = document.getElementById('infoModal');
+const closeModal = document.getElementById('closeModal');
+btnInfo.addEventListener('click', () => infoModal.style.display = 'flex');
+closeModal.addEventListener('click', () => infoModal.style.display = 'none');
+infoModal.addEventListener('click', (e) => { if (e.target === infoModal) infoModal.style.display = 'none'; });
+
+// ---------- Sinopsis Ver más / Ver menos ----------
+const synopsisText = document.getElementById('synopsisText');
+const toggleSynopsis = document.getElementById('toggleSynopsis');
+const maxLength = 200;
+if (synopsisText.textContent.length > maxLength) {
+  const fullText = synopsisText.textContent;
+  const shortText = fullText.slice(0, maxLength) + '...';
+  synopsisText.textContent = shortText;
+  toggleSynopsis.style.display = 'inline-block';
+  let expanded = false;
+  toggleSynopsis.addEventListener('click', () => {
+    if (expanded) {
+      synopsisText.textContent = shortText;
+      toggleSynopsis.textContent = 'Ver más';
+    } else {
+      synopsisText.textContent = fullText;
+      toggleSynopsis.textContent = 'Ver menos';
     }
-    try {
-      let lista = JSON.parse(localStorage.getItem('miLista')) || [];
-      const exists = lista.some(m => m.url === movieData.pageUrl);
-      if (!exists) {
-        lista.push({
-          title: movieData.title,
-          year: movieData.year,
-          poster: movieData.backdrop,
-          url: movieData.pageUrl,
-          addedAt: new Date().toISOString()
-        });
-        localStorage.setItem('miLista', JSON.stringify(lista));
-        icon.classList.replace('fa-plus', 'fa-check');
-        text.textContent = 'Añadido';
-      } else {
-        lista = lista.filter(m => m.url !== movieData.pageUrl);
-        localStorage.setItem('miLista', JSON.stringify(lista));
-        icon.classList.replace('fa-check', 'fa-plus');
-        text.textContent = 'Mi lista';
-      }
-    } catch (error) {
-      console.error('Error al acceder a localStorage:', error);
-      alert('No se pudo actualizar tu lista.');
-    }
+    expanded = !expanded;
   });
+}
 
-  // ---------- Inicializar botón Mi lista ----------
-  (function initListaButton() {
-    const btn = document.getElementById('btnLista');
-    if (!btn) return;
-    const icon = btn.querySelector('i');
-    const text = btn.querySelector('span');
-    const movieData = extractMovieData();
-    if (!movieData || !movieData.pageUrl) return;
-    const lista = JSON.parse(localStorage.getItem('miLista')) || [];
-    if (lista.some(m => m.url === movieData.pageUrl)) {
+// ========== EXTRAER DATOS DEL COMENTARIO (SIN QUITAR NADA) ==========
+function extractMovieData() {
+  let commentText = '';
+  const walker = document.createTreeWalker(document, NodeFilter.SHOW_COMMENT, null, false);
+  let node;
+  while ((node = walker.nextNode())) {
+    const value = node.nodeValue.trim();
+    if (value.startsWith('Datos')) {
+      commentText = value;
+      break;
+    }
+  }
+  if (!commentText) return null;
+  const backdropMatch = commentText.match(/Poster Backdrop:\s*([^\s]+)/i);
+  const titleMatch = commentText.match(/Titulo:\s*([^<\n\r]+)/i);
+  const yearMatch = commentText.match(/Año:\s*(\d{4})/i);
+  return {
+    backdrop: backdropMatch ? backdropMatch[1].trim() : '',
+    title: titleMatch ? titleMatch[1].trim() : '',
+    year: yearMatch ? yearMatch[1] : '',
+    pageUrl: window.location.href
+  };
+}
+
+// ---------- Mi lista (GUARDA SOLO LO NECESARIO) ----------
+document.getElementById('btnLista').addEventListener('click', (e) => {
+  const btn = e.currentTarget;
+  const icon = btn.querySelector('i');
+  const text = btn.querySelector('span');
+  const movieData = extractMovieData();
+  if (!movieData || !movieData.backdrop || !movieData.title) {
+    alert('No se pudieron obtener los datos de la película.');
+    return;
+  }
+  try {
+    let lista = JSON.parse(localStorage.getItem('miLista')) || [];
+    const exists = lista.some(m => m.url === movieData.pageUrl);
+    if (!exists) {
+      lista.push({
+        title: movieData.title,
+        year: movieData.year,
+        poster: movieData.backdrop,
+        url: movieData.pageUrl,
+        addedAt: new Date().toISOString()
+      });
+      localStorage.setItem('miLista', JSON.stringify(lista));
       icon.classList.replace('fa-plus', 'fa-check');
       text.textContent = 'Añadido';
+    } else {
+      lista = lista.filter(m => m.url !== movieData.pageUrl);
+      localStorage.setItem('miLista', JSON.stringify(lista));
+      icon.classList.replace('fa-check', 'fa-plus');
+      text.textContent = 'Mi lista';
     }
-  })();
+  } catch (error) {
+    console.error('Error al acceder a localStorage:', error);
+    alert('No se pudo actualizar tu lista.');
+  }
+});
+
+// ---------- Inicializar estado del botón ----------
+(function initListaButton() {
+  const btn = document.getElementById('btnLista');
+  if (!btn) return;
+  const icon = btn.querySelector('i');
+  const text = btn.querySelector('span');
+  const movieData = extractMovieData();
+  if (!movieData || !movieData.pageUrl) return;
+  const lista = JSON.parse(localStorage.getItem('miLista')) || [];
+  if (lista.some(m => m.url === movieData.pageUrl)) {
+    icon.classList.replace('fa-plus', 'fa-check');
+    text.textContent = 'Añadido';
+  }
+})();
 </script>
+
   <!-- Datos
    Poster Backdrop: https://image.tmdb.org/t/p/original/2JHJtATet58dzGpEwFek0kKGJFo.jpg
    Año: 2025
@@ -500,3 +477,4 @@
    -->
 </body>
 </html>
+
