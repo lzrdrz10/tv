@@ -267,84 +267,88 @@
   </div>
 
   <script>
-// ---------- Reproducir (FORZAR HORIZONTAL + PANTALLA COMPLETA) ----------
+// ---------- Reproducir (PANTALLA COMPLETA + ROTACIÓN + RECARGA SEGURA) ----------
 document.getElementById('btnReproducir').addEventListener('click', async () => {
   const cont = document.getElementById('videoCont');
   const videoFrame = document.getElementById('videoFrame');
+  const originalSrc = videoFrame.getAttribute('src'); // Fuente original fija
 
-  // Mostrar contenedor del reproductor
+  if (!originalSrc) return alert('No hay video para reproducir');
+
   cont.style.display = 'flex';
 
   try {
-    // 1. Entrar en pantalla completa
-    if (cont.requestFullscreen) {
-      await cont.requestFullscreen();
-    } else if (cont.webkitRequestFullscreen) {
-      await cont.webkitRequestFullscreen();
-    } else if (cont.msRequestFullscreen) {
-      await cont.msRequestFullscreen();
-    }
+    // 1. Pantalla completa
+    if (cont.requestFullscreen) await cont.requestFullscreen();
+    else if (cont.webkitRequestFullscreen) await cont.webkitRequestFullscreen();
+    else if (cont.msRequestFullscreen) await cont.msRequestFullscreen();
+    else if (cont.mozRequestFullScreen) await cont.mozRequestFullScreen();
 
-    // 2. Forzar orientación horizontal (solo Android y navegadores modernos)
+    // 2. Forzar orientación horizontal (solo si soporta)
     if (screen.orientation && screen.orientation.lock) {
-      await screen.orientation.lock('landscape').catch(err => {
-        console.warn("No se pudo bloquear orientación:", err);
-      });
+      await screen.orientation.lock('landscape').catch(() => {});
     }
 
-    // 3. Detectar iOS y sugerir giro manual
+    // 3. iOS: sugerir rotación
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
     if (isIOS && screen.orientation && screen.orientation.type.includes('portrait')) {
       setTimeout(() => {
-        if (confirm("Para una mejor experiencia, gira tu dispositivo horizontalmente.\n\n¿Deseas continuar?")) {
-          // Opcional: recargar iframe para ajustar
-          videoFrame.src = videoFrame.src;
+        if (!confirm("Gira tu dispositivo horizontalmente para mejor experiencia.\n¿Continuar?")) {
+          exitPlayer();
+          return;
         }
-      }, 800);
+        reloadIframe();
+      }, 600);
+    } else {
+      reloadIframe();
     }
 
-    // 4. Asegurar que el video se recargue bien en horizontal
-    setTimeout(() => {
-      const src = videoFrame.src;
-      videoFrame.src = ''; // reset
-      setTimeout(() => videoFrame.src = src, 100); // recarga
-    }, 600);
-
   } catch (err) {
-    console.error("Error al activar pantalla completa o rotación:", err);
+    console.warn("Error en fullscreen o rotación:", err);
+    reloadIframe();
+  }
+
+  function reloadIframe() {
+    videoFrame.src = '';
+    setTimeout(() => {
+      videoFrame.src = originalSrc;
+    }, 150);
+  }
+
+  function exitPlayer() {
+    cont.style.display = 'none';
+    if (document.exitFullscreen) document.exitFullscreen();
+    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+    if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
   }
 });
 
-// ---------- Volver (SALIR DE PANTALLA COMPLETA Y DESBLOQUEAR) ----------
+// ---------- Volver (SALIR LIMPIO Y RESTAURAR) ----------
 document.getElementById('btnVolver').addEventListener('click', async () => {
   const cont = document.getElementById('videoCont');
   const videoFrame = document.getElementById('videoFrame');
+  const originalSrc = videoFrame.getAttribute('src');
 
-  // Ocultar reproductor
   cont.style.display = 'none';
-
-  // Detener reproducción (limpiar iframe)
-  const src = videoFrame.src;
-  videoFrame.src = ''; // detiene el video
+  videoFrame.src = ''; // Detener video
 
   // Salir de pantalla completa
-  if (document.exitFullscreen) {
-    await document.exitFullscreen();
-  } else if (document.webkitExitFullscreen) {
-    await document.webkitExitFullscreen();
-  } else if (document.msExitFullscreen) {
-    await document.msExitFullscreen();
-  }
+  try {
+    if (document.fullscreenElement || document.webkitFullscreenElement) {
+      if (document.exitFullscreen) await document.exitFullscreen();
+      else if (document.webkitExitFullscreen) await document.webkitExitFullscreen();
+    }
+  } catch (e) {}
 
   // Desbloquear orientación
   if (screen.orientation && screen.orientation.unlock) {
-    screen.orientation.unlock();
+    try { screen.orientation.unlock(); } catch (e) {}
   }
 
-  // Restaurar el src del iframe para que esté listo la próxima vez
+  // Restaurar src para próximo uso
   setTimeout(() => {
-    videoFrame.src = src;
-  }, 500);
+    if (originalSrc) videoFrame.src = originalSrc;
+  }, 400);
 });
 
 // ---------- Descargar con 1DM ----------
@@ -352,9 +356,9 @@ document.getElementById('download-btn').addEventListener('click', (e) => {
   e.preventDefault();
   const url = e.currentTarget.getAttribute('data-url');
   if (!url) return alert('No hay enlace de descarga');
-  const clean = url.replace('https://', '').replace('http://', '');
-  const plus = 'intent://' + clean + '#Intent;package=idm.internet.download.manager.plus;scheme=https;end';
-  const normal = 'intent://' + clean + '#Intent;package=idm.internet.download.manager;scheme=https;end';
+  const clean = url.replace(/^https?:\/\//, '');
+  const plus = `intent://${clean}#Intent;package=idm.internet.download.manager.plus;scheme=https;end`;
+  const normal = `intent://${clean}#Intent;package=idm.internet.download.manager;scheme=https;end`;
   location.href = plus;
   setTimeout(() => location.href = normal, 1000);
 });
@@ -363,19 +367,24 @@ document.getElementById('download-btn').addEventListener('click', (e) => {
 const btnInfo = document.getElementById('btnInfo');
 const infoModal = document.getElementById('infoModal');
 const closeModal = document.getElementById('closeModal');
+
 btnInfo.addEventListener('click', () => infoModal.style.display = 'flex');
 closeModal.addEventListener('click', () => infoModal.style.display = 'none');
-infoModal.addEventListener('click', (e) => { if (e.target === infoModal) infoModal.style.display = 'none'; });
+infoModal.addEventListener('click', (e) => {
+  if (e.target === infoModal) infoModal.style.display = 'none';
+});
 
 // ---------- Sinopsis Ver más / Ver menos ----------
 const synopsisText = document.getElementById('synopsisText');
 const toggleSynopsis = document.getElementById('toggleSynopsis');
 const maxLength = 200;
+
 if (synopsisText.textContent.length > maxLength) {
   const fullText = synopsisText.textContent;
   const shortText = fullText.slice(0, maxLength) + '...';
   synopsisText.textContent = shortText;
   toggleSynopsis.style.display = 'inline-block';
+
   let expanded = false;
   toggleSynopsis.addEventListener('click', () => {
     if (expanded) {
@@ -389,7 +398,7 @@ if (synopsisText.textContent.length > maxLength) {
   });
 }
 
-// ========== EXTRAER DATOS DEL COMENTARIO (SIN QUITAR NADA) ==========
+// ========== EXTRAER DATOS DEL COMENTARIO ==========
 function extractMovieData() {
   let commentText = '';
   const walker = document.createTreeWalker(document, NodeFilter.SHOW_COMMENT, null, false);
@@ -402,9 +411,11 @@ function extractMovieData() {
     }
   }
   if (!commentText) return null;
+
   const backdropMatch = commentText.match(/Poster Backdrop:\s*([^\s]+)/i);
   const titleMatch = commentText.match(/Titulo:\s*([^<\n\r]+)/i);
   const yearMatch = commentText.match(/Año:\s*(\d{4})/i);
+
   return {
     backdrop: backdropMatch ? backdropMatch[1].trim() : '',
     title: titleMatch ? titleMatch[1].trim() : '',
@@ -413,19 +424,21 @@ function extractMovieData() {
   };
 }
 
-// ---------- Mi lista (GUARDA SOLO LO NECESARIO) ----------
+// ---------- Mi lista (localStorage) ----------
 document.getElementById('btnLista').addEventListener('click', (e) => {
   const btn = e.currentTarget;
   const icon = btn.querySelector('i');
   const text = btn.querySelector('span');
   const movieData = extractMovieData();
+
   if (!movieData || !movieData.backdrop || !movieData.title) {
-    alert('No se pudieron obtener los datos de la película.');
-    return;
+    return alert('No se pudieron obtener los datos de la película.');
   }
+
   try {
     let lista = JSON.parse(localStorage.getItem('miLista')) || [];
     const exists = lista.some(m => m.url === movieData.pageUrl);
+
     if (!exists) {
       lista.push({
         title: movieData.title,
@@ -444,12 +457,12 @@ document.getElementById('btnLista').addEventListener('click', (e) => {
       text.textContent = 'Mi lista';
     }
   } catch (error) {
-    console.error('Error al acceder a localStorage:', error);
-    alert('No se pudo actualizar tu lista.');
+    console.error('Error localStorage:', error);
+    alert('Error al guardar en tu lista.');
   }
 });
 
-// ---------- Inicializar estado del botón ----------
+// ---------- Inicializar botón "Mi lista" ----------
 (function initListaButton() {
   const btn = document.getElementById('btnLista');
   if (!btn) return;
@@ -457,6 +470,7 @@ document.getElementById('btnLista').addEventListener('click', (e) => {
   const text = btn.querySelector('span');
   const movieData = extractMovieData();
   if (!movieData || !movieData.pageUrl) return;
+
   const lista = JSON.parse(localStorage.getItem('miLista')) || [];
   if (lista.some(m => m.url === movieData.pageUrl)) {
     icon.classList.replace('fa-plus', 'fa-check');
@@ -477,4 +491,5 @@ document.getElementById('btnLista').addEventListener('click', (e) => {
    -->
 </body>
 </html>
+
 
