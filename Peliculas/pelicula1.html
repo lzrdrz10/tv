@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:300,400,700" rel="stylesheet">
+<title>Los Simpson: La película</title>
+<style>
+  * { box-sizing: border-box; margin:0; padding:0; }
+  html, body {
+    height:100%; width:100%; font-family: 'Roboto Condensed', sans-serif;
+    background-color: #000; color: #fff; overflow-x:hidden;
+    display:flex; flex-direction:column;
+  }
+
+  .Wallpaper {
+    position:absolute; top:0; left:0; width:100%; height:65vh;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.9)), url(https://image.tmdb.org/t/p/original/8ln5VUVk7gnNGIb2VNgw8nICDVt.jpg);
+    background-size:cover; background-position:center; z-index:0;
+  }
+
+  .main-content {
+    position: relative; z-index:1; padding:25px; margin-top:45vh;
+    display:flex; flex-direction:column; gap:25px;
+  }
+
+  .header { display:flex; gap:25px; align-items:flex-start; justify-content:flex-start; }
+  .SingleHead { width:160px; flex-shrink:0; border-radius:10px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.7); }
+  .SingleHead img { width:100%; display:block; }
+
+  .title-info h1 {
+    margin:0 0 12px; font-size:2.4em; font-weight:300;
+    text-shadow:1px 1px 4px rgba(0,0,0,0.8); line-height:1.1;
+  }
+
+  .MovieInfo { font-size:1.2em; line-height:1.8; color:#ddd; }
+  .MovieInfo b span { color:#E50914; }
+
+  .botones { margin:20px 0; }
+  #btnReproducir {
+    padding:16px 40px; font-size:1.3em; font-weight:bold;
+    background:#E50914; color:white; border:none; border-radius:8px;
+    cursor:pointer; display:inline-flex; align-items:center; gap:12px;
+    min-width:220px; justify-content:center; text-transform:uppercase;
+    transition: all 0.2s;
+  }
+  #btnReproducir:focus { outline:4px solid #fff; outline-offset:3px; transform:scale(1.05); }
+  #btnReproducir:hover { background:#c70610; }
+
+  .SinopsisBoxFixed {
+    position:fixed; top:80px; right:25px; width:30%; min-width:250px; max-height:80vh;
+    background: rgba(20,20,20,0.9); padding:20px; border-radius:10px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.7); color:#eee; font-size:1.1em; line-height:1.6;
+    overflow-y:auto; z-index:5; transition:all 0.3s;
+  }
+  .SinopsisBoxFixed:hover { box-shadow:0 15px 40px rgba(229,9,20,0.8); transform:translateY(-3px); }
+
+  /* Reproductor fullscreen */
+  #videoCont {
+    display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+    background:#000; z-index:999; justify-content:center; align-items:center;
+  }
+  #videoFrame {
+    width:100%; height:100%; border:none;
+  }
+
+  @media (max-width:1024px) {
+    .header { flex-direction:column; gap:15px; }
+    .SingleHead { width:130px; }
+    .title-info h1 { font-size:2em; }
+    #btnReproducir { font-size:1.1em; padding:14px 30px; min-width:200px; }
+    .SinopsisBoxFixed { position:static; width:100%; max-height:none; margin-top:20px; transform:none; }
+  }
+  @media (max-width:760px) {
+    .title-info h1 { font-size:1.7em; }
+    .SingleHead { width:110px; }
+    .main-content { padding:15px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="Wallpaper"></div>
+
+<div class="main-content">
+  <div class="header">
+    <div class="SingleHead">
+      <img src="https://www.themoviedb.org/t/p/w600_and_h900_bestv2/d9wHkwF9ttnNKuOoEIStve32jEk.jpg" alt="Los Simpson: La película">
+    </div>
+
+    <div class="title-info">
+      <h1>Los Simpson: La película</h1>
+      <div class="MovieInfo">
+        <b><span>Año:</span></b> <span>2007</span><br>
+        <b><span>Género:</span></b> <span>Animación, Comedia, Familia</span><br>
+        <b><span>Duración:</span></b> <span>87 Minutos</span>
+      </div>
+      <div class="botones">
+        <button id="btnReproducir" tabindex="1"><i class="fas fa-play"></i> Reproducir</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="SinopsisBoxFixed">
+  <h2 style="color:#E50914; margin-bottom:10px;">Sinopsis:</h2>
+  <p>Homer debe salvar al mundo de una catástrofe que él mismo ha provocado. Todo comienza con Homer, su nueva mascota, un cerdo, y un silo lleno de excrementos que tiene una fuga, una combinación que desencadena un desastre distinto a todo lo que Springfield haya experimentado jamás. Mientras Marge está indignada por la monumental metedura de pata de su patán marido, una turba vengativa cae sobre el hogar de los Simpson...</p>
+</div>
+
+<div id="videoCont">
+  <iframe id="videoFrame" src="https://hugh.cdn.rumble.cloud/video/fww1/90/s8/2/Q/m/f/5/Qmf5y.aaa.mp4" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+</div>
+
+<script>
+var videoCont = document.getElementById('videoCont');
+var videoFrame = document.getElementById('videoFrame');
+var btnReproducir = document.getElementById('btnReproducir');
+
+// Reproducir video fullscreen
+btnReproducir.addEventListener('click', function() {
+  videoFrame.src = '${video}';
+  videoCont.style.display = 'flex';
+  videoFrame.requestFullscreen?.();
+  // Oculta el contenido principal
+  document.querySelector('.main-content').style.display = 'none';
+  document.querySelector('.SinopsisBoxFixed').style.display = 'none';
+});
+
+// Volver al contenido
+function cerrarVideo() {
+  videoCont.style.display = 'none';
+  videoFrame.src = '';
+  document.querySelector('.main-content').style.display = 'flex';
+  document.querySelector('.SinopsisBoxFixed').style.display = 'block';
+  btnReproducir.focus();
+}
+
+// Teclas de mando
+document.addEventListener('keydown', function(e) {
+  if(e.key === 'Backspace' || e.key === 'Escape') {
+    if(videoCont.style.display === 'flex') {
+      cerrarVideo();
+    }
+  }
+  if(e.key === 'Enter' || e.key === ' ') {
+    var focused = document.activeElement;
+    if(focused && focused.click) focused.click();
+  }
+});
+
+// Enfocar botón al cargar
+window.addEventListener('load', function() {
+  btnReproducir.focus();
+});
+</script>
+
+</body>
+</html>
