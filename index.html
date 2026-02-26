@@ -1,216 +1,542 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-  <title>Netflix TV</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#E50914">
-  <style>
-    /* ===== ESTILO NETFLIX TV 2025 ===== */
-    :root {
-      --bg:#141414;
-      --card:#221f1f;
-      --text:#fff;
-      --accent:#E50914;
-      --glow:0 0 30px rgba(229,9,20,.8);
-      --radius:8px;
-    }
-    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
-    * { outline: none !important; }
-    body {
-      background:var(--bg);
-      color:var(--text);
-      font-family:'Inter',sans-serif;
-      overflow-x:hidden;
-      -webkit-font-smoothing: antialiased;
-      user-select: none;
-    }
-    /* Desactivar hover */
-    a:hover, .card:hover, .category:hover, .btn-play:hover, .btn-info:hover { all: unset; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador McDonald's</title>
 
-    header {
-      position:fixed;top:0;left:0;right:0;z-index:1000;
-      display:flex;justify-content:space-between;align-items:center;
-      padding:12px 24px;background:rgba(20,20,20,.95);
-      backdrop-filter:blur(10px);
-    }
-    header img { height:32px; }
-    nav ul { display:flex;gap:20px;list-style:none; }
-    nav a {
-	text-decoration: none;
-      color:var(--text);font-size:18px;font-weight:600;
-      padding:10px 16px;border-radius:6px;transition:all .2s;
-      white-space:nowrap;
-    }
+<style>
+:root{
+    --mc-red:#DA291C;
+    --mc-yellow:#FFC72C;
+    --success:#15803d;
+    --danger:#b91c1c;
+}
 
-    /* FOCO ULTRA VISUAL - NETFLIX STYLE */
-    nav a.focus, .btn-play.focus, .btn-info.focus,
-    .category.focus, .card.focus {
-      transform:scale(1.1) !important;
-      box-shadow:0 0 0 4px #fff, var(--glow) !important;
-      border:4px solid #fff !important;
-      z-index:10 !important;
-      position:relative;
-    }
+*{box-sizing:border-box}
 
-    .banner {
-      position:relative;height:56vh;overflow:hidden;
-      border-radius:var(--radius);margin-top:70px;
-    }
-    .banner img { width:100%;height:100%;object-fit:cover;filter:brightness(0.5); }
-    .banner-content {
-      position:absolute;bottom:0;left:0;right:0;
-      padding:40px 5%;color:#fff;z-index:2;
-    }
-    .banner-title { font-size:7vw;font-weight:700;margin-bottom:16px;text-shadow:0 2px 8px rgba(0,0,0,.8); }
-    .banner-desc { font-size:3.8vw;max-width:600px;margin-bottom:24px;opacity:.9; }
-    .btn-play,.btn-info {
-      display:inline-flex;align-items:center;gap:8px;
-      padding:14px 28px;border-radius:6px;font-weight:600;
-      font-size:17px;margin-right:12px;transition:all .2s;
-      cursor: default;
-    }
-    .btn-play { background:#fff;color:#000; }
-    .btn-info { background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3); }
+body{
+    margin:0;
+    font-family:"Segoe UI", system-ui, sans-serif;
+    background:linear-gradient(180deg,#fff,#fff7e6);
+}
 
-    .categories-container {
-      padding:16px 0;overflow-x:auto;scrollbar-width:none;
-      scroll-behavior: smooth;
-    }
-    .categories-container::-webkit-scrollbar { display:none; }
-    .categories { display:flex;gap:20px;padding:0 5%; }
-    .category {
-      flex:0 0 220px;height:140px;background:var(--card);
-      border-radius:var(--radius);overflow:hidden;
-      display:flex;align-items:center;justify-content:center;
-      position:relative;transition:all .25s;
-    }
-    .category img {
-      max-width:70%;max-height:60%;filter:brightness(0) invert(1);
-      transition:transform .3s;
-    }
-    .category.focus img { transform:scale(1.15); }
+.container{
+    max-width:800px;
+    margin:20px auto;
+    padding:16px;
+}
 
-    .section { padding:16px 5%; }
-    .section h2 { font-size:24px;margin:16px 0 12px;font-weight:700; }
-    .scroll {
-      display:flex;gap:20px;overflow-x:auto;
-      padding:8px 0;scrollbar-width:none;scroll-snap-type:x mandatory;
-      scroll-behavior: smooth;
-    }
-    .scroll::-webkit-scrollbar { display:none; }
-    .card {
-      flex:0 0 280px;height:160px;border-radius:var(--radius);
-      overflow:hidden;background:var(--card);
-      position:relative;scroll-snap-align:center;transition:all .25s;
-    }
-    .card img { width:100%;height:100%;object-fit:cover; }
-    .card-title {
-      position:absolute;bottom:0;left:0;right:0;
-      background:linear-gradient(transparent,rgba(0,0,0,.8));
-      color:#fff;padding:24px 16px 12px;
-      font-size:16px;font-weight:600;opacity:0;transition:opacity .2s;
-    }
-    .card.focus .card-title { opacity:1; }
+.card{
+    background:white;
+    border-radius:18px;
+    padding:24px;
+    box-shadow:0 15px 30px rgba(0,0,0,.1);
+    border-top:8px solid var(--mc-red);
+}
 
-    /* Indicador de scroll */
-    .scroll::after {
-      content:'';position:absolute;bottom:8px;left:50%;transform:translateX(-50%);
-      width:40px;height:4px;background:rgba(255,255,255,.3);border-radius:2px;
-      opacity:0;transition:opacity .3s;
-    }
-    .scroll:has(.card.focus)::after { opacity:1; }
+h1{
+    text-align:center;
+    color:var(--mc-red);
+    margin-top:0;
+}
 
-    footer { padding:24px;text-align:center;font-size:14px;color:#777; }
+.center{
+    text-align:center;
+}
 
-    .lazy {
-      background:#222;
-      background:linear-gradient(90deg,#222 25%,#2a2a2a 50%,#222 75%);
-      background-size:200% 100%;
-      animation:loading 1.5s infinite;
-    }
-    @keyframes loading {
-      0%{background-position:200% 0}
-      100%{background-position:-200% 0}
-    }
+.record{
+    display:inline-block;
+    background:var(--mc-yellow);
+    padding:8px 16px;
+    border-radius:999px;
+    font-weight:700;
+    margin-bottom:16px;
+}
 
-    @media(min-width:768px){
-      .banner-title{font-size:48px}
-      .banner-desc{font-size:20px}
-      .card{flex:0 0 360px;height:203px}
-      .category{flex:0 0 280px;height:160px}
-    }
-    @media(min-width:1024px){
-      .banner{height:70vh}
-      .section h2{font-size:28px}
-      nav a{font-size:20px}
-    }
-  </style>
+.timer{
+    text-align:center;
+    font-weight:700;
+    color:var(--mc-red);
+    margin:20px 0;
+}
+
+.question{
+    font-size:1.1rem;
+    font-weight:600;
+    margin-bottom:16px;
+}
+
+.options{
+    display:grid;
+    gap:12px;
+}
+
+.options label{
+    background:#fffbea;
+    padding:14px;
+    border-radius:12px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    border:2px solid transparent;
+}
+
+.options label:hover{
+    background:#fff3c4;
+}
+
+.options label:has(input:checked){
+    border-color:var(--mc-red);
+}
+
+.options input{
+    accent-color:var(--mc-red);
+    transform:scale(1.2);
+}
+
+button{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:14px;
+    background:var(--mc-red);
+    color:white;
+    font-weight:700;
+    font-size:1rem;
+    cursor:pointer;
+    margin-top:20px;
+}
+
+button:hover{
+    background:#b91c1c;
+}
+
+.result{
+    text-align:center;
+}
+
+.success{color:var(--success);font-weight:800}
+.fail{color:var(--danger);font-weight:800}
+
+/* MODAL */
+.modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:1000;
+}
+
+.modal-box{
+    background:white;
+    border-radius:18px;
+    padding:24px;
+    max-width:360px;
+    width:90%;
+    text-align:center;
+    box-shadow:0 20px 40px rgba(0,0,0,.25);
+    animation:pop .25s ease-out;
+}
+
+@keyframes pop{
+    from{transform:scale(.85);opacity:0}
+    to{transform:scale(1);opacity:1}
+}
+
+@media(max-width:480px){
+    .card{padding:16px}
+}
+</style>
 </head>
+
 <body>
-  <!-- Sonido de foco -->
-  <audio id="sfx-focus" preload="auto">
-    <source src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.mp3" type="audio/mpeg">
-  </audio>
+<div class="container">
+<div class="card">
 
-  <header>
-    <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" alt="Netflix">
-    <nav>
-      <ul>
-        <li><a href="#" data-id="home" tabindex="0">Inicio</a></li>
-        <li><a href="#" data-id="series" tabindex="0">Series</a></li>
-        <li><a href="#" data-id="peliculas" tabindex="0">Películas</a></li>
-        <li><a href="#" data-id="milista" tabindex="0">Mi lista</a></li>
-      </ul>
-    </nav>
-  </header>
+    <!-- INICIO -->
+    <div id="startScreen" class="center">
+        <h1>Simulador McDonald's</h1>
+        <div class="record" id="record">🏆 Récord: 0%</div>
+        <p>Examen de práctica – 30 minutos</p>
+        <button onclick="startExam()">🍔 Empezar examen de prueba</button>
+    </div>
 
-<div class="banner">
-  <img data-src="https://image.tmdb.org/t/p/original/8ln5VUVk7gnNGIb2VNgw8nICDVt.jpg" class="lazy" alt="Banner">
-  <div class="banner-content">
-    <h1 class="banner-title">Los Simpson: La película </h1>
-    <p class="banner-desc">Homer debe salvar al mundo de una catástrofe que él mismo ha provocado. Todo comienza con Homer, su nueva mascota, un cerdo, y un silo lleno de excrementos que tiene una fuga, una combinación que desencadena un desastre distinto a todo lo que Springfield haya experimentado jamás. Mientras Marge está indignada por la monumental metedura de pata de su patán marido, una turba vengativa cae sobre el hogar de los Simpson...</p>
-    <button class="btn-play" tabindex="0" onclick="window.location.href='Peliculas/pelicula1.html'">
-      <i class="fas fa-play"></i> Reproducir
-    </button>
-    <button class="btn-info" tabindex="0"><i class="fas fa-info-circle"></i> Más información</button>
+    <!-- EXAMEN -->
+    <div id="exam" style="display:none">
+        <div class="timer" id="timer">30:00</div>
+        <div class="question" id="question"></div>
+        <div class="options" id="options"></div>
+        <button onclick="nextQuestion()">Siguiente</button>
+    </div>
+
+    <!-- RESULTADO -->
+    <div id="result" class="result" style="display:none"></div>
+
+</div>
+</div>
+
+<!-- MODAL -->
+<div id="modal" class="modal">
+  <div class="modal-box">
+    <h3 id="modal-title"></h3>
+    <p id="modal-text"></p>
+    <button onclick="closeModal()">Continuar</button>
   </div>
 </div>
 
-  <div class="categories-container" data-row="0">
-    <div class="categories">
-      <div class="category" tabindex="0" data-title="Tendencias"><img class="lazy" data-src="https://cdn-icons-png.flaticon.com/512/1946/1946488.png"></div>
-      <div class="category" tabindex="0" data-title="Acción"><img class="lazy" data-src="https://cdn-icons-png.flaticon.com/512/3524/3524659.png"></div>
-      <div class="category" tabindex="0" data-title="Comedia"><img class="lazy" data-src="https://cdn-icons-png.flaticon.com/512/2919/2919600.png"></div>
-      <div class="category" tabindex="0" data-title="Drama"><img class="lazy" data-src="https://cdn-icons-png.flaticon.com/512/3069/3069178.png"></div>
-      <div class="category" tabindex="0" data-title="Infantil"><img class="lazy" data-src="https://cdn-icons-png.flaticon.com/512/3077/3077935.png"></div>
-    </div>
-  </div>
+<script>
+const questions = [
+ { q: "¿Cuál es la temperatura del UHC para producto de desayuno?", a: "175°F" },
+{ q: "¿Tiempo para ensamblar orden de desayuno?", a: "35 a 50 segundos" },
+{ q: "¿Cada cuánto se limpian bandejas UHC desayuno?", a: "Cada 2 horas" },
+{ q: "¿Periodo de conservación pan congelado?", a: "90 días" },
+{ q: "¿Tiempo de vida muffins en UHC?", a: "20 minutos" },
+{ q: "¿Temperatura del tostador muffin?", a: "450°F superior y 560°F inferior" },
+{ q: "¿Tiempo vida primario huevos cuarto frío?", a: "30 días" },
+{ q: "¿Tiempo vida secundario huevos?", a: "30 minutos" },
+{ q: "¿Cómo manejar cascarones de huevo?", a: "Botar inmediatamente para evitar bacterias" },
+{ q: "¿Temperatura interna huevos muffin?", a: "Arriba de 155°F" },
+{ q: "¿Tiempo cocción huevos redondos?", a: "150 segundos" },
+{ q: "¿Cantidad huevos por bandeja UHC?", a: "8 huevos" },
+{ q: "¿Tiempo vida huevos redondos?", a: "20 minutos" },
+{ q: "¿Temperatura de cocción huevos muffin?", a: "265°F" },
+{ q: "¿Tiempo cocción huevos doblados?", a: "85 segundos" },
+{ q: "¿Cantidad huevos doblados por bandeja?", a: "6 huevos" },
+{ q: "¿Tiempo vida huevos doblados?", a: "20 minutos" },
+{ q: "¿Tiempo vida huevos revueltos?", a: "20 minutos" },
+{ q: "¿Tiempo batido mezcla hot cakes?", a: "2 minutos" },
+{ q: "¿Temperatura plancha hot cakes?", a: "360°F" },
+{ q: "¿Tiempo vida hot cakes UHC?", a: "20 minutos" },
+{ q: "¿Tiempo cocción salchicha?", a: "82 segundos" },
+{ q: "¿Tiempo vida salchicha UHC?", a: "1 hora" },
+{ q: "¿Tiempo cocción jamón?", a: "8 a 10 segundos por lado" },
+{ q: "¿Tiempo vida jamón UHC?", a: "30 minutos" },
+{ q: "¿Tiempo cocción tocino?", a: "160 +/- 5 segundos" },
+{ q: "¿Tiempo vida tocino?", a: "4 horas" },
+{ q: "¿Tiempo cocción plátanos?", a: "75 segundos" },
+{ q: "¿Tiempo vida plátanos?", a: "1 hora" },
+{ q: "¿Tiempo cocción nuggets?", a: "3:30 minutos" },
+{ q: "¿Tiempo vida nuggets?", a: "20 minutos" },
+{ q: "¿Temperatura freidora hashbrowns?", a: "360°F" },
+{ q: "¿Tiempo vida hashbrowns?", a: "10 minutos" },
+{ q: "¿Temperatura vitrina pay?", a: "150°F a 180°F" },
+{ q: "¿Tiempo vida total pay?", a: "1 hora 30 minutos" },
+{ q: "¿Tiempo vida café?", a: "2 horas" },
+{ q: "¿Temperatura cafetera?", a: "185°F a 205°F" },
+{ q: "¿Tiempo caída espresso?", a: "20 a 30 segundos" },
+{ q: "¿Temperatura topping sundae?", a: "115°F a 125°F" },
+{ q: "¿Tiempo vida mezcla sundae?", a: "12 días" },
+{ q: "¿Visión de McDonald's?", a: "Ser el lugar y la manera favorita de comer" },
+{ q: "¿Tiempo servicio mostrador?", a: "90 segundos" },
+{ q: "¿Tiempo servicio automac?", a: "120 segundos" },
+{ q: "¿Temperatura UHC carnes?", a: "175°F" },
+{ q: "¿Tiempo vida carnes UHC?", a: "10 minutos" },
+{ q: "¿Temperatura UHC pollo?", a: "200°F" },
+{ q: "¿Bacteria pollo y huevos?", a: "Salmonela" },
+{ q: "¿Tiempo cocción pollo grill?", a: "225 y 165 segundos" },
+{ q: "¿Tiempo vida grill UHC?", a: "1 hora" },
+{ q: "¿Tiempo cocción McPollo?", a: "3 minutos" },
+{ q: "¿Tiempo vida McPollo?", a: "30 minutos" },
+{ q: "¿Temperatura cuarto congelado?", a: "0°F a -10°F" },
+{ q: "Cual es la temperatura del UHC para producto de desayuno", a: "175°F" },
+{ q: "Cual es el tiempo para ensamblar la orden de desayuno", a: "35 a 50 segundos" },
+{ q: "Las bandejas del desayuno UHC se limpian y sanitizan por lo menos", a: "Cada 2 horas" },
+{ q: "El periodo de conservación de los panes congelados es de", a: "90 dias" },
+{ q: "Cual es el tiempo de vida y de descongelación del pan muffins", a: "48 horas de vida y 12 de descongelación" },
+{ q: "Cantidad de muffins en la bandeja UHC", a: "6 panes" },
+{ q: "Tiempo de vida de los muffins en el UHC", a: "20 minutos" },
+{ q: "Tiempo del tostado del pan muffins", a: "22 segundos" },
+{ q: "Cual es la temperatura que debe dar el pan al salir del tostador Vertical", a: "160°F" },
+{ q: "Cual es la temperatura del tostador muffin", a: "450° Superior y 560°F inferior" },
+{ q: "Tiempo de vida  primario de los huevos en el cuarto frio", a: "30 días" },
+{ q: "Tiempo de vida secundario de los huevos", a: "30 minutos" },
+{ q: "Explique de manera correcta como manejar los cascarones de los huevos", a: "Botar inmediatamente para no contraer bacterias" },
+{ q: "Explique de donde debe tomar debe tomar el agua que se utiliza para cocinar los huevos", a: "Del grifo" },
+{ q: "Cual es la temperatura interna de los huevos muffin al realizar comida segura en la primera tanda", a: "Arriba de 155°F" },
+{ q: "Tiempo de cocción de los huevos redondos", a: "150 Segundos" },
+{ q: "Cantidad de huevos por bandeja en UHC", a: "8 Huevos" },
+{ q: "Tiempo de vida de los huevos redondos", a: "20 minutos" },
+{ q: "Cuando va a cocinar huevos muffin en que lugar parte los huevos", a: "En el aro de los huevos" },
+{ q: "Cuanto lleva de loroco un huevo muffin", a: "1 Onza" },
+{ q: "Que espera el cliente del huevo redondo", a: "Yema bien cocida,gelatinosa y no liquida,calientes y húmedos" },
+{ q: "Para garantizar comida segura en el desayuno las yemas de los huevos muffin deben presentar ciertas características y son", a: "Que tenga yema coagulada y no liquida" },
+{ q: "A que temperatura se cocinan los huevos muffin", a: "265°F" },
+{ q: "Tiempo de cocción de los huevos doblados", a: "85 segundos" },
+{ q: "Cantidad de huevos doblados por bandeja UHC", a: "6 Huevos" },
+{ q: "Tiempo de vida de los huevos doblados", a: "20 minutos" },
+{ q: "Cuantos huevos doblados se pueden cocinar", a: "6 huevos por tanda" },
+{ q: "La cantidad máxima de huevos ya batidos que se permite almacenar según el manual de optimización de desayuno en un cambro de acero inoxidable es de", a: "60 Huevos" },
+{ q: "El tiempo de vida secundario de los huevos batidos a temperatura ambiente es de", a: "30 minutos" },
+{ q: "Cantidad de huevos revueltos por bandeja", a: "4 Porciones" },
+{ q: "Tiempo de vida de los huevos revueltos", a: "20 minutos" },
+{ q: "Cuantos huevos revueltos se pueden cocinar", a: "8 Huevos para 6 porciones" },
+{ q: "Por cuanto tiempo debemos batir la mezcla para los hot cakes", a: "2 minutos" },
+{ q: "Cual es el tiempo de vida de la mezcla para hot cakes a temperatura ambiente", a: "2 Horas" },
+{ q: "Cual es el tiempo de coccion de los hot cakes en el primer lado", a: "90 Segundos" },
+{ q: "Cual es el tiempo de coccion de los hot cakes en el segundo lado", a: "50 Segundos" },
+{ q: "Cual es el rendimiento de los hot cakes", a: "13 a 15 porciones" },
+{ q: "A que temperatura debe estar la plancha plana para hot cakes", a: "360°F" },
+{ q: "Tiempo de vida en el UHC de los Hot Cakes", a: "20 minutos" },
+{ q: "A que temperatura  debe estar la clamshell para cocinar salchicha", a: "350°F Inferior y 425°F Superior" },
+{ q: "Tiempo de cocción de la salchicha", a: "82 Segundos" },
+{ q: "Cual es la tanda máxima de salchichas que se puede cocinar", a: "8 salchichas" },
+{ q: "Cuantas salchichas puede colocar como máxima en una bandeja", a: "16 Salchichas" },
+{ q: "Tiempo de vida de la salchicha en el UHC", a: "1 Hora" },
+{ q: "Por que es importante sacar las porciones inmediatamente después de terminar el ciclo de coccion", a: "Hay que sacarlas a tiempo para no sobre cocinar y afectar la calidad del producto" },
+{ q: "Tanda máxima de jamones", a: "8 Jamones" },
+{ q: "Tiempo de vida en el cuarto frio", a: "40 Dias" },
+{ q: "Tiempo de vida del jamon en el UHC", a: "30 Minutos" },
+{ q: "Tiempo de coccion del jamon", a: "8 a 10 segundos por lado" },
+{ q: "Cual es el tiempo secundario del jamon después de abierto", a: "72 Horas" },
+{ q: "Tiempo máximo para sacar el tocino", a: "10 segundos" },
+{ q: "Cual es el tiempo de coccion del tocino", a: "160+/-5 segundos" },
+{ q: "Cual es el tiempo de vida del tocino", a: "4 Horas" },
+{ q: "Cual es el GAP en la parrilla Taylor del tocino", a: "0.265" },
+{ q: "Cual es el GAP en la parrila chamblel del tocino", a: "0.435" },
+{ q: "Cual es el tiempo de coccion de los platanos", a: "75 segundos" },
+{ q: "Cual es el tiempo de vida de los platanos", a: "1 Hora" },
+{ q: "Cual es la tanda máxima para cocinar platanos", a: "12 Porciones" },
+{ q: "El primer paso operacional para bajar plátano es", a: "" },
+{ q: "Cual es la tanda máxima por cesta", a: "2 Bolsas de 24 unidades por cesta" },
+{ q: "Cual es el tiempo de vida de los Nuggets", a: "20 minutos" },
+{ q: "Cual es el tiempo de coccion de los Nuggets", a: "3:30 Minutos" },
+{ q: "Tiempo primario de las hasbrows", a: "270 Dias" },
+{ q: "Temperatura de la freidora de hasbrows", a: "360°F" },
+{ q: "Cual es el tiempo de coccion de la hasbrows", a: "2:45 minutos" },
+{ q: "Cual es el tiempo de vida de la hasbrows", a: "10 Minutos" },
+{ q: "Que espera el cliente sobre la hasbrows", a: "Suaves por dentro y crujientes por fuera" },
+{ q: "Cuantas hasbrows se pueden bajar por cesta", a: "8 Unidades" },
+{ q: "Cual es la temperatura de la vitrina para pay", a: "150°F a 180°F" },
+{ q: "Cual es el tiempo de calentamiento del payera", a: "30 Minutos" },
+{ q: "Cual es la temperatura correcta para freir el pay", a: "360°F" },
+{ q: "Cual es el tiempo de coccion del pay", a: "6 Minutos" },
+{ q: "Cual es el tiempo de enfriamiento del pay", a: "20 Minutos" },
+{ q: "Cual es el tiempo de vida del pay en la vitrina", a: "1 Hora y 10 Minutos" },
+{ q: "Cual es el tiempo de vida en total del pay", a: "1 Hora y 30 Minutos" },
+{ q: "Tanda máxima por cesta del pay", a: "16 Unidades" },
+{ q: "Cual es el tiempo de vida secundario del café según manual", a: "2 Horas" },
+{ q: "Cual es la temperatura de la cafetera", a: "185°F a 205°F" },
+{ q: "La temperatura de salida del jugo de naranja", a: "33°F a 45°F" },
+{ q: "Cual es la proporción correcta de sirope y agua  para la coca cola: y para la fanta es 5.3 y para el Sprite 5.1", a: "5.2 de Agua por 1 de Jarabe" },
+{ q: "Cual es el tiempo de caída del expresso", a: "20 a 30 segundos" },
+{ q: "A que temperatura debe salir el topping caliente para sundae", a: "115°F a 125°F" },
+{ q: "Cual es la temperatura de la mezcla para sundae", a: "16°F a 18°F" },
+{ q: "Cual es la tasa de flujo de salida del sundae", a: "5 a 7.5 Onzas por 10 segundos" },
+{ q: "Cuantas onzas de mezcla lleva un sundae", a: "4 Onzas" },
+{ q: "Tiempo de vida de la mecla del sundae", a: "12 días incluyendo 3 dias de descongelación" },
+{ q: "Cual es el tiempo de vida de los topping calientes", a: "7 Dias" },
+{ q: "Cuantas onzas de mezcla lleva un McFlurry", a: "8 Onzas" },
+{ q: "Cual es el tiempo de vida para los topping de McFlurry", a: "72 Horas (3 Dias)" },
+{ q: "Por cuantos segundos debe batir el McFlurry", a: "5 a 8 Segundos" },
+{ q: "Cuantas onzas de mezcla lleva un cono", a: "3.5 Onzas" },
+{ q: "Cual es el tiempo de vida de los conos", a: "24 Horas" },
+{ q: "Con que frecuencia se deben reemplazar las bandas de goma o juego de enpaques de la maquina de sundae", a: "Cada 3 meses" },
+{ q: "Cual es la temperatura de la tolba,maquina de helados", a: "34°F a 40°F" },
+{ q: "Cual es la visión de McDonals", a: "Ser el lugar y la manera favorita de comer de nuestros clientes" },
+{ q: "Cual es el tiempo de servicio en el mostrador", a: "90 Segundos" },
+{ q: "Cual es el tiempo de servicio a mesa", a: "45 segundos" },
+{ q: "Cual es el servicio que esperan nuestros clientes", a: "Rapido,exacto,amable." },
+{ q: "Tiempo de servicio en el automac", a: "120 segundos" },
+{ q: "Experiencia total del cliente", a: "3:30 Minutos" },
+{ q: "Cual es el tiempo para reunir la orden", a: "12 a 16 segundos" },
+{ q: "Tiempo para entregar la orden", a: "10 a 15 segundos" },
+{ q: "Que significa P.E.M.A", a: "Producto en mano afuera" },
+{ q: "Para cumplir con la seguridad de la comida,las porciones de carne deben de estar a una temperatura interna arriba de", a: "Todas las carnes deben estar arriba de 155°F" },
+{ q: "Cual es la regla de calidad con best Burger", a: "3 de 4 carnes deben estar entre el  rango de 155°F a 170°F" },
+{ q: "La bandejas del amuerzo UHC se limpian y sanitizan por lo menos", a: "Cada 4 horas" },
+{ q: "Que espera el cliente de la carne", a: "Bien cocida,bien sasonada,bien jugosa." },
+{ q: "Temperatura correcta de la carne cruda", a: "0 a -10°F" },
+{ q: "Cual es el orden correcto para bajar carnes del monitor", a: "Miro,borro,cocino" },
+{ q: "Porque es importante sacar la carne inmediatamente después del ciclo de cocción", a: "Porque la carne se reseca" },
+{ q: "Cual es el tiempo en el que se deben sacar las carnes regulares", a: "18 segundos" },
+{ q: "Cual es el tiempo de coccion de la carne 10:1", a: "39 segundos" },
+{ q: "Cual es el tiempo de coccion de la carne 4:1", a: "110 segundos" },
+{ q: "Cual es el tiempo de coccion de la carne 3:1", a: "158 segundos" },
+{ q: "Temperatura de las planchas para cocinar las carnes", a: "350°F inferior - 425°F superior" },
+{ q: "Cual es la temperatura del UHC de carnes", a: "175°F" },
+{ q: "Tiempo de vida de las carnes en el UHC", a: "10 minutos" },
+{ q: "Cual es la temperatura del UHC de pollo", a: "200°F" },
+{ q: "Cual es la bacteria que poseen los productos de pollo y huevos", a: "Salmonela" },
+{ q: "Cual es el tiempo de coccion del pollo Grill", a: "225 primer lado y 165 segundos por el segundo lado" },
+{ q: "La cantidad de agua que deben llevar las bandejas de tortas grill en el UHC es de", a: "6 Onzas de agua de la cafetera" },
+{ q: "Cual es la temperatura de la plancha para la grill", a: "350°F" },
+{ q: "Cual es el tiempo de vida en el UHC de la grill", a: "1 Hora" },
+{ q: "Cual   es la temperatura del marinador", a: "100°F" },
+{ q: "Cual es el tiempo de coccion del Mc Pollo", a: "3 Minutos" },
+{ q: "Cual es el tiempo de vida de la Mc pollo en el UHC", a: "30 Minutos" },
+{ q: "Cual es la cantidad máxima de Mc Pollo por cesta", a: "6 piezas" },
+{ q: "Cual es el tiempo de coccion de el pollo Crispy", a: "5:45 minutos" },
+{ q: "Cual es el tiempo de vida del pollo Crispy en el UHC", a: "1 Hora" },
+{ q: "Cual es la cantidad máxima de pollo Crispy", a: "5 Piezas" },
+{ q: "Tiempo de vida de los Nuggets", a: "20 minutos" },
+{ q: "Tiempo de coccion de los Nuggets", a: "3:30 Minutos" },
+{ q: "Cual es el tiempo de vida del dispensador de cebolla", a: "4 Horas" },
+{ q: "Por cuanto mínimo se remoja la cebolla deshidratada según el manual", a: "1 Hora" },
+{ q: "Tiempo de vida del tomate en mesa", a: "30 Minutos" },
+{ q: "Cual es el tiempo de vida del tomate luego del rebanado", a: "2 horas" },
+{ q: "Temperatura adecuada del queso", a: "60°F a 65°F" },
+{ q: "Tiempo de vida del queso", a: "4 Horas incluyendo 2 de temporización" },
+{ q: "Tiempo de vida del queso en mesa", a: "30 Minutos" },
+{ q: "Tiempo de vida de la lechuga en mesa", a: "30 Minutos" },
+{ q: "Cual es el tiempo de vida del batter en el área de pollo", a: "2 Horas de vida" },
+{ q: "En el alto movimiento se debe cernir el breading", a: "Cada 2 tandas" },
+{ q: "Que cantidad de mostaza lleva una hamburgueza", a: "1/8 de onza" },
+{ q: "Que cantidad de mayoneza lleva una McPollo", a: "½ Onza" },
+{ q: "Que cantidad de Ketchup lleva una hamburguesa", a: "½ onza" },
+{ q: "Que cantidad de lechuga lleva una hamburguesa", a: "1 onza" },
+{ q: "Cuales son los dos sistemas de producción que se usan en el manejo vertical del UHC", a: "Mantenimiento y recuperación" },
+{ q: "En que numero se debe colocar el dial del tostador vertical", a: "Dial #4" },
+{ q: "Cual es el procedimiento de los McPop", a: "Descongele por una hora en la mesa de fritos,luego pase al cambro y coloque 12 horas de vida incluyendo la hora de descongelamiento" },
+{ q: "Cual es la temperatura de la mesa de preparación", a: "125°F" },
+{ q: "El rendimiento de las papas fritas es de", a: "380 a 400 papas pequeñas por cada 100 libras" },
+{ q: "A que temperatura debe estar el tostador vertical", a: "350°F" },
+{ q: "tiempo de vida de la leche para la melita?", a: "48 horas" },
+{ q: "tiempo de caida del espresso", a: "10 a 20 segundos" },
+{ q: "cuantas onzas de mezcla lleva un cono pequeño", a: "2.5 onzas" },
+{ q: "cual es el tiempo de los huevos muffin en el UHC", a: "20 minutos" },
+{ q: "cuantas onzas de mezcla lleva un McFlurry batido", a: "8 onzas" },
+{ q: "el tiempo de vida secundario del pan incluyendo su periodo de descongelamiento es de", a: "48 horas" },
+{ q: "cual es el rango de temperatura en que se reproducen las bacterias", a: "40°F a 140°F" },
+{ q: "cual es la temperatura del UHC para productos de pollo", a: "200°F" },
+{ q: "cual es el tiempo de vida del pie", a: "1 hora 30 minutos incluyendo su enfriamiento" },
+{ q: "para cumplir con la seguridad de la comida las porciones de carne deben de estar a una temperatura interna arriba de", a: "155°F" },
+{ q: "cual es el tiempo de vida secundario del sirope de te lipton", a: "21 dias" },
+{ q: "cual es el tiempo de vida de la mezcla de iced coffe en el mantenedor", a: "12 horas" },
+{ q: "en cuanto tiempo se cocinan los huevos revueltos", a: "35 segundos" },
+{ q: "la cantidad maxima de huevos ya batidos qie se permiten almacenar segun el manual de optimizacion de desayuno en un cambro de acero inoxidable es de", a: "60 huevos" },
+{ q: "cual es la temperatura de la freidora de papas francesas", a: "335°F" },
+{ q: "cual es el tiempo de vida de los platanos cocinados en el UHC", a: "60 minutos" },
+{ q: "cual es el rendimiento de las papas", a: "380 a 400 papas pequeñas por cada 100 libras" },
+{ q: "cuanto de salsa lleva un big mac en total", a: "1 onza" },
+{ q: "el tiempo de vida secundario de los huevos batidos a temperatura ambiente es de", a: "30 minutos" },
+{ q: "cual es la temperatura del cuarto congelado", a: "0°F a -10°F" },
+{ q: "segun el manual best burger cual es la temperatura del queso temperado", a: "60°F a 65°F" },
+{ q: "cual es el tiempo secundario de las tortillas de harina incluyendo su periodo de descongelacion", a: "48 horas" },
+{ q: "si va a preparar una tanda de cafe para el mantenedor de iced coffee, cuantas onzas de hielo le agrega al cafe", a: "32 onzas de hielo" },
+{ q: "la temperatura inferior de la parrilla es de", a: "350°F" },
+{ q: "cual es el servicio del mostrador con servicio a la mesa", a: "135 segundos" },
+{ q: "segun el manual de limpieza y sanitizacion que cantidad de agua deben de contener los botes para trapos", a: "2.5 galones" },
+{ q: "en MFY en la preparacion hay 3 reglas que debemos respetar que son", a: "no regresar, no cruzar, no saltar" },
+{ q: "segun el boletin de limpieza y sanitizacion que significa limpio", a: "Libre de polvo y basura visible" },
+{ q: "cual es el tiempo de vida del tocino en tiras ya cocido", a: "4 horas" },
+{ q: "cual es el tiempo de vida secundario del pan muffin", a: "48 horas incluyendo 12 horas de descongelacion" },
+{ q: "cual es el GAP en la parrilla Taylor del tocino", a: "0.265" },
+{ q: "cual es el tiempo de vida de la cebolla rehidratada en la parrilla", a: "4 horas" },
+{ q: "cual es el tiempo para reunir un pedido en el automac", a: "12 a 16 segundos" },
+{ q: "el tiempo de coccion de las pechugas grill", a: "225 segundos el primer lado y 165 el segundo lado" },
+{ q: "cuanto es el tiempo de experiencia total en el automac", a: "120 segundos" },
+{ q: "cual es el tiempo de vida de la carne bordes irregulares 3.1 en el UHC", a: "10 minutos" },
+{ q: "cual es el tiempo de vida secundario de los topping crocantes para los McFlurry", a: "72 horas" },
+{ q: "la cantidad de agua que deben llevar las bandejar de torta grill en el UHC es de", a: "6 onzas de agua de la cafetera" },
+{ q: "cual es el tiempo de vida secundario del cafe en las jarras metalicas", a: "2 horas" },
+{ q: "en que momento utilizamos guantes azules desechables", a: "al manipular huevos, pollo o carne cruda" },
+{ q: "que usa como guia para abastecer el area de servicio", a: "daily" },
+{ q: "el tiempo de cocimiento de los huevos muffin es de", a: "150 segundos" },
+{ q: "a que temperatura se cocinan los huevos muffin", a: "265°F" },
+{ q: "cual es el tiempo de coccion del tocino en tiras", a: "160 +/- 5 segundos" },
+{ q: "Que cantidad de harina de hotcake se necesita para preparar mezcla de hotcake", a: "38.5 onzas de harina" },
+{ q: "cual es el tiempo de vida de los vegetales en mesa de preparacion", a: "30 minutos" },
+{ q: "cuantos sobres de ketchup lleva una papa grande para llevar", a: "3 sobres" },
+{ q: "en el sistema de MFY en cuanto tiempo se debe preparar una hamburguesa desde que sale en el KVS hasta llegar al OAT", a: "25 a 50 segundos" },
+{ q: "cual es el tiempo de coccion de las tortas crispys en la freidora de pollo", a: "6 minutos" },
+{ q: "cual es el tiempo de vida secundario del jamon despues de abierto", a: "72 horas" }
+];
 
-  <div class="section" data-row="1">
-    <h2>Recomendaciones para ti</h2>
-    <div class="scroll">
-      <div class="card" tabindex="0" data-title="Stranger Things"><img class="lazy" data-src="https://image.tmdb.org/t/p/w780/49WJfeN0CzAs8ALhhVJ9vF17IG.jpg"><div class="card-title">Stranger Things</div></div>
-      <div class="card" tabindex="0" data-title="The Crown"><img class="lazy" data-src="https://image.tmdb.org/t/p/w780/pNiB0OuXrYkREfI7rH4cJYqPp1.jpg"><div class="card-title">The Crown</div></div>
-      <div class="card" tabindex="0" data-title="Breaking Bad"><img class="lazy" data-src="https://image.tmdb.org/t/p/w780/ggFHVNu6YYI5L9pCfOacjizRGt.jpg"><div class="card-title">Breaking Bad</div></div>
-      <div class="card" tabindex="0" data-title="Squid Game"><img class="lazy" data-src="https://image.tmdb.org/t/p/w780/dDlEmu3YjkIi5IEvwkmJiuKrV02.jpg"><div class="card-title">Squid Game</div></div>
-    </div>
-  </div>
+questions.sort(()=>Math.random()-0.5);
+const selected = questions.slice(0,150);
 
-  <div class="section" data-row="2">
-    <h2>Top 10 en tu país</h2>
-    <div class="scroll">
-      <div class="card" tabindex="0" data-title="The Witcher"><img class="lazy" data-src="https://image.tmdb.org/t/p/w780/7zL5z4gP0jsaL0T0g86xK7q2yM.jpg"><div class="card-title">The Witcher</div></div>
-      <div class="card" tabindex="0" data-title="Money Heist"><img class="lazy" data-src="https://image.tmdb.org/t/p/w780/reEMJA1uzscCbkpeRJeTT2bjqUp.jpg"><div class="card-title">Money Heist</div></div>
-      <div class="card" tabindex="0" data-title="Dark"><img class="lazy" data-src="https://image.tmdb.org/t/p/w780/apbrGds2iP4p8kDfc9P2Efr5J9.jpg"><div class="card-title">Dark</div></div>
-    </div>
-  </div>
+let index=0, correct=0, time=1800, timerInt;
+let bestRecord = localStorage.getItem("mc_record") || 0;
+document.getElementById("record").innerText = `🏆 Récord: ${bestRecord}%`;
 
-  <footer><p>Netflix TV • Optimizado para Smart TV</p></footer>
-  <script src="script.js"></script>
+function startExam(){
+    document.getElementById("startScreen").style.display="none";
+    document.getElementById("exam").style.display="block";
+    startTimer();
+    showQuestion();
+}
+
+function showQuestion(){
+    const q = selected[index];
+    document.getElementById("question").innerText =
+        `Pregunta ${index+1}: ${q.q}`;
+    const opts = document.getElementById("options");
+    opts.innerHTML="";
+    let options=[q.a];
+    while(options.length<4){
+        let r=questions[Math.floor(Math.random()*questions.length)].a;
+        if(!options.includes(r)) options.push(r);
+    }
+    options.sort(()=>Math.random()-0.5);
+    options.forEach(o=>{
+        const l=document.createElement("label");
+        l.innerHTML=`<input type="radio" name="opt" value="${o}"><span>${o}</span>`;
+        opts.appendChild(l);
+    });
+}
+
+function nextQuestion(){
+    const sel=document.querySelector("input[name='opt']:checked");
+    if(!sel){
+        showModal("⚠️ Atención","Selecciona una respuesta",false);
+        return;
+    }
+    if(sel.value===selected[index].a){
+        correct++;
+        index++;
+        index>=selected.length?finishExam():showQuestion();
+    }else{
+        showModal("❌ Incorrecto",
+        `La respuesta correcta es:<br><strong>${selected[index].a}</strong>`,true);
+    }
+}
+
+function finishExam(){
+    clearInterval(timerInt);
+    document.getElementById("exam").style.display="none";
+    const percent=Math.round((correct/selected.length)*100);
+    if(percent>bestRecord){
+        bestRecord=percent;
+        localStorage.setItem("mc_record",bestRecord);
+    }
+    document.getElementById("result").style.display="block";
+    document.getElementById("result").innerHTML=`
+        <h2>Resultado Final</h2>
+        <p>${correct} / ${selected.length}</p>
+        <p><strong>${percent}%</strong></p>
+        <p class="${percent>=90?'success':'fail'}">
+        ${percent>=90?'✅ APROBADO':'❌ REPROBADO'}
+        </p>`;
+}
+
+function startTimer(){
+    timerInt=setInterval(()=>{
+        time--;
+        let m=Math.floor(time/60), s=time%60;
+        document.getElementById("timer").innerText=
+        `${m}:${s<10?'0':''}${s}`;
+        if(time<=0) finishExam();
+    },1000);
+}
+
+/* MODAL */
+function showModal(title,text,advance){
+    document.getElementById("modal-title").innerHTML=title;
+    document.getElementById("modal-text").innerHTML=text;
+    document.getElementById("modal").style.display="flex";
+    window.advanceAfterModal=advance;
+}
+function closeModal(){
+    document.getElementById("modal").style.display="none";
+    if(window.advanceAfterModal){
+        index++;
+        index>=selected.length?finishExam():showQuestion();
+    }
+}
+</script>
 </body>
-
 </html>
