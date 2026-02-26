@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Simulador McDonald's</title>
-
 <style>
 :root{
     --mc-red:#DA291C;
@@ -12,21 +11,17 @@
     --success:#15803d;
     --danger:#b91c1c;
 }
-
 *{box-sizing:border-box}
-
 body{
     margin:0;
     font-family:"Segoe UI", system-ui, sans-serif;
     background:linear-gradient(180deg,#fff,#fff7e6);
 }
-
 .container{
     max-width:800px;
     margin:20px auto;
     padding:16px;
 }
-
 .card{
     background:white;
     border-radius:18px;
@@ -34,17 +29,14 @@ body{
     box-shadow:0 15px 30px rgba(0,0,0,.1);
     border-top:8px solid var(--mc-red);
 }
-
 h1{
     text-align:center;
     color:var(--mc-red);
     margin-top:0;
 }
-
 .center{
     text-align:center;
 }
-
 .record{
     display:inline-block;
     background:var(--mc-yellow);
@@ -53,25 +45,21 @@ h1{
     font-weight:700;
     margin-bottom:16px;
 }
-
 .timer{
     text-align:center;
     font-weight:700;
     color:var(--mc-red);
     margin:20px 0;
 }
-
 .question{
     font-size:1.1rem;
     font-weight:600;
     margin-bottom:16px;
 }
-
 .options{
     display:grid;
     gap:12px;
 }
-
 .options label{
     background:#fffbea;
     padding:14px;
@@ -82,20 +70,16 @@ h1{
     gap:10px;
     border:2px solid transparent;
 }
-
 .options label:hover{
     background:#fff3c4;
 }
-
 .options label:has(input:checked){
     border-color:var(--mc-red);
 }
-
 .options input{
     accent-color:var(--mc-red);
     transform:scale(1.2);
 }
-
 button{
     width:100%;
     padding:14px;
@@ -108,18 +92,14 @@ button{
     cursor:pointer;
     margin-top:20px;
 }
-
 button:hover{
     background:#b91c1c;
 }
-
 .result{
     text-align:center;
 }
-
 .success{color:var(--success);font-weight:800}
 .fail{color:var(--danger);font-weight:800}
-
 /* MODAL */
 .modal{
     position:fixed;
@@ -130,7 +110,6 @@ button:hover{
     justify-content:center;
     z-index:1000;
 }
-
 .modal-box{
     background:white;
     border-radius:18px;
@@ -141,22 +120,18 @@ button:hover{
     box-shadow:0 20px 40px rgba(0,0,0,.25);
     animation:pop .25s ease-out;
 }
-
 @keyframes pop{
     from{transform:scale(.85);opacity:0}
     to{transform:scale(1);opacity:1}
 }
-
 @media(max-width:480px){
     .card{padding:16px}
 }
 </style>
 </head>
-
 <body>
 <div class="container">
 <div class="card">
-
     <!-- INICIO -->
     <div id="startScreen" class="center">
         <h1>Simulador McDonald's</h1>
@@ -164,7 +139,6 @@ button:hover{
         <p>Examen de práctica – 30 minutos</p>
         <button onclick="startExam()">🍔 Empezar examen de prueba</button>
     </div>
-
     <!-- EXAMEN -->
     <div id="exam" style="display:none">
         <div class="timer" id="timer">30:00</div>
@@ -172,13 +146,10 @@ button:hover{
         <div class="options" id="options"></div>
         <button onclick="nextQuestion()">Siguiente</button>
     </div>
-
     <!-- RESULTADO -->
     <div id="result" class="result" style="display:none"></div>
-
 </div>
 </div>
-
 <!-- MODAL -->
 <div id="modal" class="modal">
   <div class="modal-box">
@@ -187,7 +158,6 @@ button:hover{
     <button onclick="closeModal()">Continuar</button>
   </div>
 </div>
-
 <script>
 const questions = [
  { q: "¿Cuál es la temperatura del UHC para producto de desayuno?", a: "175°F" },
@@ -252,7 +222,7 @@ const questions = [
 { q: "Tiempo del tostado del pan muffins", a: "22 segundos" },
 { q: "Cual es la temperatura que debe dar el pan al salir del tostador Vertical", a: "160°F" },
 { q: "Cual es la temperatura del tostador muffin", a: "450° Superior y 560°F inferior" },
-{ q: "Tiempo de vida  primario de los huevos en el cuarto frio", a: "30 días" },
+{ q: "Tiempo de vida primario de los huevos en el cuarto frio", a: "30 días" },
 { q: "Tiempo de vida secundario de los huevos", a: "30 minutos" },
 { q: "Explique de manera correcta como manejar los cascarones de los huevos", a: "Botar inmediatamente para no contraer bacterias" },
 { q: "Explique de donde debe tomar debe tomar el agua que se utiliza para cocinar los huevos", a: "Del grifo" },
@@ -281,7 +251,7 @@ const questions = [
 { q: "Cual es el rendimiento de los hot cakes", a: "13 a 15 porciones" },
 { q: "A que temperatura debe estar la plancha plana para hot cakes", a: "360°F" },
 { q: "Tiempo de vida en el UHC de los Hot Cakes", a: "20 minutos" },
-{ q: "A que temperatura  debe estar la clamshell para cocinar salchicha", a: "350°F Inferior y 425°F Superior" },
+{ q: "A que temperatura debe estar la clamshell para cocinar salchicha", a: "350°F Inferior y 425°F Superior" },
 { q: "Tiempo de cocción de la salchicha", a: "82 Segundos" },
 { q: "Cual es la tanda máxima de salchichas que se puede cocinar", a: "8 salchichas" },
 { q: "Cuantas salchichas puede colocar como máxima en una bandeja", a: "16 Salchichas" },
@@ -321,7 +291,7 @@ const questions = [
 { q: "Cual es el tiempo de vida secundario del café según manual", a: "2 Horas" },
 { q: "Cual es la temperatura de la cafetera", a: "185°F a 205°F" },
 { q: "La temperatura de salida del jugo de naranja", a: "33°F a 45°F" },
-{ q: "Cual es la proporción correcta de sirope y agua  para la coca cola: y para la fanta es 5.3 y para el Sprite 5.1", a: "5.2 de Agua por 1 de Jarabe" },
+{ q: "Cual es la proporción correcta de sirope y agua para la coca cola: y para la fanta es 5.3 y para el Sprite 5.1", a: "5.2 de Agua por 1 de Jarabe" },
 { q: "Cual es el tiempo de caída del expresso", a: "20 a 30 segundos" },
 { q: "A que temperatura debe salir el topping caliente para sundae", a: "115°F a 125°F" },
 { q: "Cual es la temperatura de la mezcla para sundae", a: "16°F a 18°F" },
@@ -346,7 +316,7 @@ const questions = [
 { q: "Tiempo para entregar la orden", a: "10 a 15 segundos" },
 { q: "Que significa P.E.M.A", a: "Producto en mano afuera" },
 { q: "Para cumplir con la seguridad de la comida,las porciones de carne deben de estar a una temperatura interna arriba de", a: "Todas las carnes deben estar arriba de 155°F" },
-{ q: "Cual es la regla de calidad con best Burger", a: "3 de 4 carnes deben estar entre el  rango de 155°F a 170°F" },
+{ q: "Cual es la regla de calidad con best Burger", a: "3 de 4 carnes deben estar entre el rango de 155°F a 170°F" },
 { q: "La bandejas del amuerzo UHC se limpian y sanitizan por lo menos", a: "Cada 4 horas" },
 { q: "Que espera el cliente de la carne", a: "Bien cocida,bien sasonada,bien jugosa." },
 { q: "Temperatura correcta de la carne cruda", a: "0 a -10°F" },
@@ -365,7 +335,7 @@ const questions = [
 { q: "La cantidad de agua que deben llevar las bandejas de tortas grill en el UHC es de", a: "6 Onzas de agua de la cafetera" },
 { q: "Cual es la temperatura de la plancha para la grill", a: "350°F" },
 { q: "Cual es el tiempo de vida en el UHC de la grill", a: "1 Hora" },
-{ q: "Cual   es la temperatura del marinador", a: "100°F" },
+{ q: "Cual es la temperatura del marinador", a: "100°F" },
 { q: "Cual es el tiempo de coccion del Mc Pollo", a: "3 Minutos" },
 { q: "Cual es el tiempo de vida de la Mc pollo en el UHC", a: "30 Minutos" },
 { q: "Cual es la cantidad máxima de Mc Pollo por cesta", a: "6 piezas" },
@@ -445,21 +415,33 @@ const questions = [
 { q: "cual es el tiempo de coccion de las tortas crispys en la freidora de pollo", a: "6 minutos" },
 { q: "cual es el tiempo de vida secundario del jamon despues de abierto", a: "72 horas" }
 ];
-
 questions.sort(()=>Math.random()-0.5);
 const selected = questions.slice(0,150);
-
 let index=0, correct=0, time=1800, timerInt;
 let bestRecord = localStorage.getItem("mc_record") || 0;
 document.getElementById("record").innerText = `🏆 Récord: ${bestRecord}%`;
-
+function getCategory(a) {
+  const lowerA = a.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  if (lowerA.includes("°f") || lowerA.includes("° f") || lowerA.includes("f°")) return "temp";
+  if (lowerA.includes("segundos") || lowerA.includes("segundo")) return "time_sec";
+  if (lowerA.includes("minutos") || lowerA.includes("minuto")) return "time_min";
+  if (lowerA.includes("horas") || lowerA.includes("hora")) return "time_hour";
+  if (lowerA.includes("dias") || lowerA.includes("dia") || lowerA.includes("días")) return "time_day";
+  if (lowerA.includes("onzas") || lowerA.includes("onza")) return "quantity_oz";
+  if (lowerA.includes("huevos") || lowerA.includes("huevo")) return "quantity_eggs";
+  if (lowerA.includes("salchichas") || lowerA.includes("salchicha")) return "quantity_sausage";
+  if (lowerA.includes("jamones") || lowerA.includes("jamon")) return "quantity_ham";
+  if (lowerA.includes("porciones") || lowerA.includes("porcion")) return "quantity_portions";
+  if (lowerA.includes("piezas")) return "quantity_pieces";
+  if (lowerA.includes("unidades")) return "quantity_units";
+  return "other";
+}
 function startExam(){
     document.getElementById("startScreen").style.display="none";
     document.getElementById("exam").style.display="block";
     startTimer();
     showQuestion();
 }
-
 function showQuestion(){
     const q = selected[index];
     document.getElementById("question").innerText =
@@ -467,8 +449,24 @@ function showQuestion(){
     const opts = document.getElementById("options");
     opts.innerHTML="";
     let options=[q.a];
-    while(options.length<4){
-        let r=questions[Math.floor(Math.random()*questions.length)].a;
+    const category = getCategory(q.a);
+    let possibleDistractors = questions.filter(q2 => getCategory(q2.a) === category && q2.a !== q.a);
+    if (possibleDistractors.length < 3) {
+        possibleDistractors = questions.filter(q2 => q2.a !== q.a);
+    }
+    const selectedDistractors = [];
+    while (selectedDistractors.length < 3 && possibleDistractors.length > 0) {
+        const randIndex = Math.floor(Math.random() * possibleDistractors.length);
+        const r = possibleDistractors[randIndex].a;
+        if (!options.includes(r)) {
+            options.push(r);
+            selectedDistractors.push(r);
+        }
+        possibleDistractors.splice(randIndex, 1);
+    }
+    while(options.length < 4) {
+        const randIndex = Math.floor(Math.random() * questions.length);
+        const r = questions[randIndex].a;
         if(!options.includes(r)) options.push(r);
     }
     options.sort(()=>Math.random()-0.5);
@@ -478,7 +476,6 @@ function showQuestion(){
         opts.appendChild(l);
     });
 }
-
 function nextQuestion(){
     const sel=document.querySelector("input[name='opt']:checked");
     if(!sel){
@@ -494,7 +491,6 @@ function nextQuestion(){
         `La respuesta correcta es:<br><strong>${selected[index].a}</strong>`,true);
     }
 }
-
 function finishExam(){
     clearInterval(timerInt);
     document.getElementById("exam").style.display="none";
@@ -512,7 +508,6 @@ function finishExam(){
         ${percent>=90?'✅ APROBADO':'❌ REPROBADO'}
         </p>`;
 }
-
 function startTimer(){
     timerInt=setInterval(()=>{
         time--;
@@ -522,7 +517,6 @@ function startTimer(){
         if(time<=0) finishExam();
     },1000);
 }
-
 /* MODAL */
 function showModal(title,text,advance){
     document.getElementById("modal-title").innerHTML=title;
